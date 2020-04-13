@@ -44,8 +44,11 @@ class Stream(Object):
         super().__init__()
         self.stream = stream or []
 
-    def clip(self):
-        self.stream.append('W')
+    def clip(self, rule='winding'):
+        if rule == 'winding':
+            self.stream.append('W')
+        elif rule == 'even-odd':
+            self.stream.append('W*')
 
     def close(self):
         self.stream.append('h')
