@@ -47,8 +47,32 @@ class Stream(Object):
     def clip(self):
         self.stream.append('W')
 
+    def close(self):
+        self.stream.append('h')
+
     def curve_to(self, x1, y1, x2, y2, x3, y3):
         self.stream.append(f'{x1} {y1} {x2} {y2} {x3} {y3} c')
+
+    def end(self):
+        self.stream.append('n')
+
+    def fill(self, rule='winding'):
+        if rule == 'winding':
+            self.stream.append('f')
+        elif rule == 'even-odd':
+            self.stream.append('f*')
+
+    def fill_and_stroke(self, rule='winding'):
+        if rule == 'winding':
+            self.stream.append('B')
+        elif rule == 'even-odd':
+            self.stream.append('B*')
+
+    def fill_stroke_and_close(self, rule='winding'):
+        if rule == 'winding':
+            self.stream.append('b')
+        elif rule == 'even-odd':
+            self.stream.append('b*')
 
     def line_to(self, x, y):
         self.stream.append(f'{x} {y} l')
@@ -63,6 +87,9 @@ class Stream(Object):
 
     def stroke(self):
         self.stream.append('s')
+
+    def stroke_and_close(self):
+        self.stream.append('S')
 
     @property
     def data(self):
@@ -261,6 +288,7 @@ if __name__ == '__main__':
 
     draw2 = Stream()
     draw2.rectangle(100, 100, 50, 70)
+    draw2.fill()
     draw2.stroke()
     document.add_object(draw2)
 
