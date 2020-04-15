@@ -80,6 +80,12 @@ class Stream(Object):
     def stroke_and_close(self):
         self.stream.append('S')
 
+    def push_state(self):
+        self.stream.append('q')
+
+    def pop_state(self):
+        self.stream.append('Q')
+
     @property
     def data(self):
         result = []
