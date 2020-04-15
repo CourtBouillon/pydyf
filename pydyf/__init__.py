@@ -44,11 +44,8 @@ class Stream(Object):
         super().__init__()
         self.stream = stream or []
 
-    def clip(self, rule='winding'):
-        if rule == 'winding':
-            self.stream.append('W')
-        elif rule == 'even-odd':
-            self.stream.append('W*')
+    def clip(self, even_odd=False):
+        self.stream.append('W*' if even_odd else 'W')
 
     def close(self):
         self.stream.append('h')
@@ -59,30 +56,19 @@ class Stream(Object):
     def end(self):
         self.stream.append('n')
 
-    def fill(self, rule='winding'):
-        if rule == 'winding':
-            self.stream.append('f')
-        elif rule == 'even-odd':
-            self.stream.append('f*')
+    def fill(self, even_odd=False):
+        self.stream.append('f*' if even_odd else 'f')
 
-    def fill_and_stroke(self, rule='winding'):
-        if rule == 'winding':
-            self.stream.append('B')
-        elif rule == 'even-odd':
-            self.stream.append('B*')
+    def fill_and_stroke(self, even_odd=False):
+        self.stream.append('B*' if even_odd else 'B')
 
-    def fill_stroke_and_close(self, rule='winding'):
-        if rule == 'winding':
-            self.stream.append('b')
-        elif rule == 'even-odd':
-            self.stream.append('b*')
+    def fill_stroke_and_close(self, even_odd=False):
+        self.stream.append('b*' if even_odd else 'b')
 
     def line_to(self, x, y):
         self.stream.append(f'{x} {y} l')
 
     def move_to(self, x, y):
-        if self.stream and self.stream[-1][-1] == 'm':
-            self.stream.pop(-1)
         self.stream.append(f'{x} {y} m')
 
     def rectangle(self, x, y, width, height):
