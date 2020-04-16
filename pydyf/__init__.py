@@ -102,6 +102,9 @@ class Stream(Object):
     def stroke_and_close(self):
         self.stream.append('S')
 
+    def transform(self, a, b, c, d, e, f):
+        self.stream.append(f'{a} {b} {c} {d} {e} {f} cm')
+
     @property
     def data(self):
         result = []
@@ -305,6 +308,7 @@ if __name__ == '__main__':
     draw2.rectangle(50, 50, 20, 40)
     draw2.set_dash(Array([]), 0)
     draw2.set_line_width(10)
+    draw2.transform(1, 0, 0, 1, 80, 80)
     draw2.stroke()
     document.add_object(draw2)
 
