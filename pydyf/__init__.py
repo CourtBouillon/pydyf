@@ -93,6 +93,9 @@ class Stream(Object):
     def set_dash(self, dash_array, dash_phase):
         self.stream.append(f'{dash_array.data} {dash_phase} d')
 
+    def set_line_width(self, width):
+        self.stream.append(f'{width} w')
+
     def stroke(self):
         self.stream.append('s')
 
@@ -301,6 +304,7 @@ if __name__ == '__main__':
     draw2.stroke()
     draw2.rectangle(50, 50, 20, 40)
     draw2.set_dash(Array([]), 0)
+    draw2.set_line_width(10)
     draw2.stroke()
     document.add_object(draw2)
 
