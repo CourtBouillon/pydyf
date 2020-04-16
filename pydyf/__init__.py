@@ -96,7 +96,7 @@ class Stream(Object):
     def set_line_width(self, width):
         self.stream.append(f'{width} w')
 
-    def set_source_rgb(self, r, g, b, stroke=False):
+    def set_color_rgb(self, r, g, b, stroke=False):
         self.stream.append(f'{r} {g} {b} RG' if stroke else f'{r} {g} {b} rg')
 
     def stroke(self):
