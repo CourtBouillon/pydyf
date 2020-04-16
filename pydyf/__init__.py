@@ -222,7 +222,7 @@ class PDF:
         self.write_line(str(self.xref_position), output)
         self.write_line('%%EOF', output)
 
-    def write(self, output=sys.stdout):
+    def write(self, output=sys.stdout.buffer):
         self.write_header(output)
         self.write_body(output)
         self.write_cross_reference_table(output)
