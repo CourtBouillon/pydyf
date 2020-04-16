@@ -253,8 +253,8 @@ if __name__ == '__main__':
 #        'ET',
 #    ))
     draw = Stream()
-    draw.set_source_rgb(1.0, 0.0, 0.0)
-    draw.set_source_rgb(0.0, 1.0, 0.0, stroke=True)
+    draw.set_color_rgb(1.0, 0.0, 0.0)
+    draw.set_color_rgb(0.0, 1.0, 0.0, stroke=True)
     draw.rectangle(100, 100, 50, 70)
     draw.set_dash(Array([2, 1]), 0)
     draw.stroke()
