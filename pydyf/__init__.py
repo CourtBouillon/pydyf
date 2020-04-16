@@ -90,14 +90,14 @@ class Stream(Object):
     def rectangle(self, x, y, width, height):
         self.stream.append(f'{x} {y} {width} {height} re')
 
+    def set_color_rgb(self, r, g, b, stroke=False):
+        self.stream.append(f'{r} {g} {b} RG' if stroke else f'{r} {g} {b} rg')
+
     def set_dash(self, dash_array, dash_phase):
         self.stream.append(f'{dash_array.data} {dash_phase} d')
 
     def set_line_width(self, width):
         self.stream.append(f'{width} w')
-
-    def set_color_rgb(self, r, g, b, stroke=False):
-        self.stream.append(f'{r} {g} {b} RG' if stroke else f'{r} {g} {b} rg')
 
     def set_state(self, state_name):
         self.stream.append(f'/{state_name} gs')
