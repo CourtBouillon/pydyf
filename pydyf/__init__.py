@@ -1,3 +1,13 @@
+"""
+pydyf − Low-level PDF generator
+
+"""
+
+import sys
+
+VERSION = __version__ = '0.0.1'
+
+
 class Object:
     def __init__(self):
         self.number = None
@@ -183,49 +193,50 @@ class PDF:
         object_.number = len(self.objects)
         self.objects.append(object_)
 
-    def write_line(self, content):
+    def write_line(self, content, output):
         self.current_position += len(content) + 1
-        print(content, end='\n')
+        output.write((content + '\n').encode('ascii'))
 
-    def write_object(self, object_):
+    def write_object(self, object_, output):
         for line in object_.data.split('\n'):
-            self.write_line(line)
+            self.write_line(line, output)
 
-    def write_header(self):
-        self.write_line('%PDF-1.7')
+    def write_header(self, output):
+        self.write_line('%PDF-1.7', output)
 
-    def write_body(self):
+    def write_body(self, output):
         for object_ in self.objects:
             if object_.free == 'f':
                 continue
             object_.offset = self.current_position
-            self.write_line(object_.indirect)
+            self.write_line(object_.indirect, output)
 
-    def write_cross_reference_table(self):
-        self.write_line('xref')
+    def write_cross_reference_table(self, output):
+        self.write_line('xref', output)
         self.xref_position = self.current_position
-        self.write_line(f'0 {len(self.objects)}')
+        self.write_line(f'0 {len(self.objects)}', output)
         for object_ in self.objects:
             self.write_line(
-                f'{object_.offset:010} {object_.generation:05} {object_.free} '
+                f'{object_.offset:010} {object_.generation:05} '
+                f'{object_.free} ', output
             )
 
-    def write_trailer(self):
-        self.write_line('trailer')
+    def write_trailer(self, output):
+        self.write_line('trailer', output)
         self.write_object(Dictionary({
             'Size': len(self.objects),
             'Root': self.catalog.reference,
             'Info': self.info.reference,
-        }))
-        self.write_line('startxref')
-        self.write_line(str(self.xref_position))
-        self.write_line('%%EOF')
+        }), output)
+        self.write_line('startxref', output)
+        self.write_line(str(self.xref_position), output)
+        self.write_line('%%EOF', output)
 
-    def write(self):
-        self.write_header()
-        self.write_body()
-        self.write_cross_reference_table()
-        self.write_trailer()
+    def write(self, output=sys.stdout):
+        self.write_header(output)
+        self.write_body(output)
+        self.write_cross_reference_table(output)
+        self.write_trailer(output)
 
 
 if __name__ == '__main__':
