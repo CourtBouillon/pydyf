@@ -91,13 +91,6 @@ class Stream(Object):
         self.stream.append(f'{x} {y} {width} {height} re')
 
     def set_dash(self, dash_array, dash_phase):
-        value_sum = 0
-        for value in dash_array:
-            if value < 0:
-                print('dash_array contains negatives values')
-            value_sum += value
-        if value_sum == 0:
-            print('all values of the dash_array cannot be zero')
         self.stream.append(f'{dash_array.data} {dash_phase} d')
 
     def stroke(self):
