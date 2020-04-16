@@ -96,6 +96,9 @@ class Stream(Object):
     def set_line_width(self, width):
         self.stream.append(f'{width} w')
 
+    def set_source_rgb(self, r, g, b, stroke=False):
+        self.stream.append(f'{r} {g} {b} RG' if stroke else f'{r} {g} {b} rg')
+
     def stroke(self):
         self.stream.append('s')
 
@@ -250,6 +253,8 @@ if __name__ == '__main__':
 #        'ET',
 #    ))
     draw = Stream()
+    draw.set_source_rgb(1.0, 0.0, 0.0)
+    draw.set_source_rgb(0.0, 1.0, 0.0, stroke=True)
     draw.rectangle(100, 100, 50, 70)
     draw.set_dash(Array([2, 1]), 0)
     draw.stroke()
@@ -257,6 +262,7 @@ if __name__ == '__main__':
     draw.set_dash(Array([]), 0)
     draw.set_line_width(10)
     draw.transform(1, 0, 0, 1, 80, 80)
+    draw.fill()
     draw.stroke()
     document.add_object(draw)
 
