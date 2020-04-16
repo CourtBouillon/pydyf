@@ -71,6 +71,12 @@ class Stream(Object):
     def move_to(self, x, y):
         self.stream.append(f'{x} {y} m')
 
+    def pop_state(self):
+        self.stream.append('Q')
+
+    def push_state(self):
+        self.stream.append('q')
+
     def rectangle(self, x, y, width, height):
         self.stream.append(f'{x} {y} {width} {height} re')
 
@@ -79,12 +85,6 @@ class Stream(Object):
 
     def stroke_and_close(self):
         self.stream.append('S')
-
-    def push_state(self):
-        self.stream.append('q')
-
-    def pop_state(self):
-        self.stream.append('Q')
 
     @property
     def data(self):
