@@ -1,0 +1,27 @@
+[build-system]
+requires = ['flit']
+build-backend = 'flit.buildapi'
+
+[tool.flit.metadata]
+module = 'pydyf'
+author = 'CourtBouillon'
+author-email = 'contact@courtbouillon.org'
+maintainer = 'CourtBouillon'
+maintainer-email = 'contact@courtbouillon.org'
+requires-python = '>=3.5'
+keywords = 'pdf generator'
+classifiers = [
+  'Development Status :: 1 - Planning',
+  'Intended Audience :: Developers',
+  'License :: OSI Approved :: BSD License',
+  'Operating System :: OS Independent',
+  'Programming Language :: Python',
+  'Programming Language :: Python :: 3',
+  'Programming Language :: Python :: 3 :: Only',
+  'Programming Language :: Python :: 3.5',
+  'Programming Language :: Python :: 3.6',
+  'Programming Language :: Python :: 3.7',
+  'Programming Language :: Python :: 3.8',
+  'Programming Language :: Python :: Implementation :: CPython',
+  'Programming Language :: Python :: Implementation :: PyPy',
+]

@@ -1,4 +1,11 @@
+"""
+pydyf − Low-level PDF generator
+
+"""
+
 import sys
+
+VERSION = __version__ = '0.0.1'
 
 
 class Object:
