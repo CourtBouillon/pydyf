@@ -99,6 +99,9 @@ class Stream(Object):
     def set_color_rgb(self, r, g, b, stroke=False):
         self.stream.append(f'{r} {g} {b} RG' if stroke else f'{r} {g} {b} rg')
 
+    def set_state(self, state_name):
+        self.stream.append(f'/{state_name} gs')
+
     def stroke(self):
         self.stream.append('s')
 
@@ -252,6 +255,14 @@ if __name__ == '__main__':
 #        'Tj',
 #        'ET',
 #    ))
+
+    graphic_state = Dictionary({
+        'Type': '/ExtGState',
+        'CA': 0.5,
+        'ca': 0.5,
+    })
+    document.add_object(graphic_state)
+
     draw = Stream()
     draw.set_color_rgb(1.0, 0.0, 0.0)
     draw.set_color_rgb(0.0, 1.0, 0.0, stroke=True)
@@ -262,6 +273,7 @@ if __name__ == '__main__':
     draw.set_dash(Array([]), 0)
     draw.set_line_width(10)
     draw.transform(1, 0, 0, 1, 80, 80)
+    draw.set_state('GS1')
     draw.fill()
     draw.stroke()
     document.add_object(draw)
@@ -283,6 +295,7 @@ if __name__ == '__main__':
         'Resources': Dictionary({
             'ProcSet': Array(['/PDF', '/Text']),
             'Font': Dictionary({'F1': font.reference}),
+            'ExtGState': Dictionary({'GS1': graphic_state.reference}),
         })
     }))
 
