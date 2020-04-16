@@ -80,6 +80,9 @@ class Stream(Object):
     def rectangle(self, x, y, width, height):
         self.stream.append(f'{x} {y} {width} {height} re')
 
+    def set_dash(self, dash_array, dash_phase):
+        self.stream.append(f'{dash_array.data} {dash_phase} d')
+
     def stroke(self):
         self.stream.append('s')
 
@@ -283,7 +286,10 @@ if __name__ == '__main__':
 
     draw2 = Stream()
     draw2.rectangle(100, 100, 50, 70)
-    draw2.fill()
+    draw2.set_dash(Array([2, 1]), 0)
+    draw2.stroke()
+    draw2.rectangle(50, 50, 20, 40)
+    draw2.set_dash(Array([]), 0)
     draw2.stroke()
     document.add_object(draw2)
 
