@@ -94,7 +94,7 @@ class Stream(Object):
         self.stream.append(f'{r} {g} {b} RG' if stroke else f'{r} {g} {b} rg')
 
     def set_dash(self, dash_array, dash_phase):
-        self.stream.append(f'{dash_array.data} {dash_phase} d')
+        self.stream.append(f'{Array(dash_array).data} {dash_phase} d')
 
     def set_line_width(self, width):
         self.stream.append(f'{width} w')
@@ -267,10 +267,10 @@ if __name__ == '__main__':
     draw.set_color_rgb(1.0, 0.0, 0.0)
     draw.set_color_rgb(0.0, 1.0, 0.0, stroke=True)
     draw.rectangle(100, 100, 50, 70)
-    draw.set_dash(Array([2, 1]), 0)
+    draw.set_dash([2, 1], 0)
     draw.stroke()
     draw.rectangle(50, 50, 20, 40)
-    draw.set_dash(Array([]), 0)
+    draw.set_dash([], 0)
     draw.set_line_width(10)
     draw.transform(1, 0, 0, 1, 80, 80)
     draw.set_state('GS1')
