@@ -103,10 +103,10 @@ class Stream(Object):
         self.stream.append(f'/{state_name} gs')
 
     def stroke(self):
-        self.stream.append('s')
+        self.stream.append('S')
 
     def stroke_and_close(self):
-        self.stream.append('S')
+        self.stream.append('s')
 
     def transform(self, a, b, c, d, e, f):
         self.stream.append(f'{a} {b} {c} {d} {e} {f} cm')
