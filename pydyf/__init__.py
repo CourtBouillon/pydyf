@@ -38,6 +38,15 @@ class Dictionary(Object):
         super().__init__()
         self.values = values
 
+    def __setitem__(self, key, value):
+        self.values[key] = value
+
+    def __getitem__(self, key):
+        return self.values[key]
+
+    def __delitem__(self, key):
+        del self.values[key]
+
     @property
     def data(self):
         result = ['<<']
@@ -141,6 +150,15 @@ class Array(Object):
     def __init__(self, array):
         super().__init__()
         self.array = array
+
+    def __setitem__(self, key, value):
+        self.array[key] = value
+
+    def __getitem__(self, key):
+        return self.array[key]
+
+    def __delitem__(self, key):
+        del self.array[key]
 
     @property
     def data(self):
