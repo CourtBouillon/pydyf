@@ -143,7 +143,7 @@ class String(Object):
 
     @property
     def data(self):
-        return f'( {self.string} )'
+        return f'({self.string})'
 
 
 class Array(Object):
