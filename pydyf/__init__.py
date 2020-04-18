@@ -181,12 +181,6 @@ class PDF:
         zero_object._indirect = ''
         self.add_object(zero_object)
 
-        self.outlines = Dictionary({
-            'Type': '/Outlines',
-            'Count': 0,
-        })
-        self.add_object(self.outlines)
-
         self.pages = Dictionary({
             'Type': '/Pages',
             'Kids': Array([]),
@@ -199,7 +193,6 @@ class PDF:
 
         self.catalog = Dictionary({
             'Type': '/Catalog',
-            'Outlines': self.outlines.reference,
             'Pages': self.pages.reference,
         })
         self.add_object(self.catalog)
