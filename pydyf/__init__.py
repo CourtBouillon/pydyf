@@ -33,24 +33,15 @@ class Object:
         raise NotImplementedError()
 
 
-class Dictionary(Object):
+class Dictionary(Object, dict):
     def __init__(self, values):
-        super().__init__()
-        self.values = values
-
-    def __setitem__(self, key, value):
-        self.values[key] = value
-
-    def __getitem__(self, key):
-        return self.values[key]
-
-    def __delitem__(self, key):
-        del self.values[key]
+        Object.__init__(self)
+        dict.__init__(self, values)
 
     @property
     def data(self):
         result = ['<<']
-        for key, value in self.values.items():
+        for key, value in self.items():
             if isinstance(value, Object):
                 value = value.data
             result.append(f'/{key} {value}')
@@ -146,24 +137,15 @@ class String(Object):
         return f'({self.string})'
 
 
-class Array(Object):
+class Array(Object, list):
     def __init__(self, array):
-        super().__init__()
-        self.array = array
-
-    def __setitem__(self, key, value):
-        self.array[key] = value
-
-    def __getitem__(self, key):
-        return self.array[key]
-
-    def __delitem__(self, key):
-        del self.array[key]
+        Object.__init__(self)
+        list.__init__(self, array)
 
     @property
     def data(self):
         result = ['[']
-        for child in self.array:
+        for child in self:
             if isinstance(child, Object):
                 child = child.data
             result.append(str(child))
@@ -201,9 +183,9 @@ class PDF:
         self.xref_position = None
 
     def add_page(self, page):
-        self.pages.values['Count'] += 1
+        self.pages['Count'] += 1
         self.add_object(page)
-        self.pages.values['Kids'].array.extend([page.number, 0, 'R'])
+        self.pages['Kids'].extend([page.number, 0, 'R'])
 
     def add_object(self, object_):
         object_.number = len(self.objects)
