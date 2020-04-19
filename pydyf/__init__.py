@@ -34,9 +34,9 @@ class Object:
 
 
 class Dictionary(Object, dict):
-    def __init__(self, values):
+    def __init__(self, values=None):
         Object.__init__(self)
-        dict.__init__(self, values)
+        dict.__init__(self, values or {})
 
     @property
     def data(self):
@@ -138,9 +138,9 @@ class String(Object):
 
 
 class Array(Object, list):
-    def __init__(self, array):
+    def __init__(self, array=None):
         Object.__init__(self)
-        list.__init__(self, array)
+        list.__init__(self, array or [])
 
     @property
     def data(self):
