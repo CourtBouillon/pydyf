@@ -3,6 +3,7 @@ pydyf − Low-level PDF generator
 
 """
 
+from codecs import BOM_UTF16_BE
 import sys
 
 VERSION = __version__ = '0.0.1'
@@ -18,10 +19,10 @@ class Object:
 
     @property
     def indirect(self):
-        return '\n'.join((
-            f'{self.number} {self.generation} obj',
+        return b'\n'.join((
+            f'{self.number} {self.generation} obj'.encode('ascii'),
             self.data,
-            'endobj',
+            b'endobj',
         ))
 
     @property
@@ -40,13 +41,17 @@ class Dictionary(Object, dict):
 
     @property
     def data(self):
-        result = ['<<']
+        result = [b'<<']
         for key, value in self.items():
             if isinstance(value, Object):
                 value = value.data
-            result.append(f'/{key} {value}')
-        result.append('>>')
-        return '\n'.join(result)
+            elif not isinstance(value, bytes):
+                value = str(value).encode('ascii')
+            if isinstance(key, str):
+                key = key.encode('ascii')
+            result.append(b'/' + key + b' ' + value)
+        result.append(b'>>')
+        return b'\n'.join(result)
 
 
 class Stream(Object):
@@ -94,7 +99,8 @@ class Stream(Object):
         self.stream.append(f'{r} {g} {b} RG' if stroke else f'{r} {g} {b} rg')
 
     def set_dash(self, dash_array, dash_phase):
-        self.stream.append(f'{Array(dash_array).data} {dash_phase} d')
+        self.stream.append(
+            f'{Array(dash_array).data.decode("ascii")} {dash_phase} d')
 
     def set_line_width(self, width):
         self.stream.append(f'{width} w')
@@ -117,13 +123,15 @@ class Stream(Object):
         for item in self.stream:
             if isinstance(item, Object):
                 item = item.data
+            elif isinstance(item, str):
+                item = item.encode('ascii')
             result.append(item)
-        stream = '\n'.join(result)
-        return '\n'.join((
-            f'<< /Length {len(stream) + 1} >>',
-            'stream',
+        stream = b'\n'.join(result)
+        return b'\n'.join((
+            b'<< /Length ' + str(len(stream) + 1).encode('ascii') + b' >>',
+            b'stream',
             stream,
-            'endstream',
+            b'endstream',
         ))
 
 
@@ -134,7 +142,13 @@ class String(Object):
 
     @property
     def data(self):
-        return f'({self.string})'
+        if isinstance(self.string, str):
+            try:
+                encoded_str = self.string.encode('ascii')
+            except UnicodeEncodeError:
+                encoded_str = BOM_UTF16_BE + self.string.encode('utf-16-be')
+            return b'(' + encoded_str + b')'
+        return b'(' + self.string + b')'
 
 
 class Array(Object, list):
@@ -144,13 +158,15 @@ class Array(Object, list):
 
     @property
     def data(self):
-        result = ['[']
+        result = [b'[']
         for child in self:
             if isinstance(child, Object):
                 child = child.data
-            result.append(str(child))
-        result.append(']')
-        return ' '.join(result)
+            elif not isinstance(child, bytes):
+                child = str(child).encode('ascii')
+            result.append(child)
+        result.append(b']')
+        return b' '.join(result)
 
 
 class PDF:
@@ -193,14 +209,14 @@ class PDF:
 
     def write_line(self, content, output):
         self.current_position += len(content) + 1
-        output.write((content + '\n').encode('ascii'))
+        output.write(content + b'\n')
 
     def write_object(self, object_, output):
-        for line in object_.data.split('\n'):
+        for line in object_.data.split(b'\n'):
             self.write_line(line, output)
 
     def write_header(self, output):
-        self.write_line('%PDF-1.7', output)
+        self.write_line(b'%PDF-1.7', output)
 
     def write_body(self, output):
         for object_ in self.objects:
@@ -210,25 +226,25 @@ class PDF:
             self.write_line(object_.indirect, output)
 
     def write_cross_reference_table(self, output):
-        self.write_line('xref', output)
+        self.write_line(b'xref', output)
         self.xref_position = self.current_position
-        self.write_line(f'0 {len(self.objects)}', output)
+        self.write_line(f'0 {len(self.objects)}'.encode('ascii'), output)
         for object_ in self.objects:
             self.write_line(
-                f'{object_.offset:010} {object_.generation:05} '
-                f'{object_.free} ', output
+                (f'{object_.offset:010} {object_.generation:05} '
+                 f'{object_.free} ').encode('ascii'), output
             )
 
     def write_trailer(self, output):
-        self.write_line('trailer', output)
+        self.write_line(b'trailer', output)
         self.write_object(Dictionary({
             'Size': len(self.objects),
             'Root': self.catalog.reference,
             'Info': self.info.reference,
         }), output)
-        self.write_line('startxref', output)
-        self.write_line(str(self.xref_position), output)
-        self.write_line('%%EOF', output)
+        self.write_line(b'startxref', output)
+        self.write_line(str(self.xref_position).encode('ascii'), output)
+        self.write_line(b'%%EOF', output)
 
     def write(self, output=sys.stdout.buffer):
         self.write_header(output)
