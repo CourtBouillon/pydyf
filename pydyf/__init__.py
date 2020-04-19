@@ -55,9 +55,10 @@ class Dictionary(Object, dict):
 
 
 class Stream(Object):
-    def __init__(self, stream=None):
+    def __init__(self, stream=None, extra=None):
         super().__init__()
         self.stream = stream or []
+        self.extra = extra or {}
 
     def clip(self, even_odd=False):
         self.stream.append('W*' if even_odd else 'W')
@@ -127,12 +128,9 @@ class Stream(Object):
                 item = str(item).encode('ascii')
             result.append(item)
         stream = b'\n'.join(result)
-        return b'\n'.join((
-            b'<< /Length ' + str(len(stream) + 1).encode('ascii') + b' >>',
-            b'stream',
-            stream,
-            b'endstream',
-        ))
+        extra = Dictionary(self.extra.copy())
+        extra['Length'] = len(stream) + 1
+        return b'\n'.join((extra.data, b'stream', stream, b'endstream'))
 
 
 class String(Object):
