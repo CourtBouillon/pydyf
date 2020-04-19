@@ -47,8 +47,8 @@ class Dictionary(Object, dict):
                 value = value.data
             elif not isinstance(value, bytes):
                 value = str(value).encode('ascii')
-            if isinstance(key, str):
-                key = key.encode('ascii')
+            if not isinstance(key, bytes):
+                key = str(key).encode('ascii')
             result.append(b'/' + key + b' ' + value)
         result.append(b'>>')
         return b'\n'.join(result)
@@ -123,8 +123,8 @@ class Stream(Object):
         for item in self.stream:
             if isinstance(item, Object):
                 item = item.data
-            elif isinstance(item, str):
-                item = item.encode('ascii')
+            elif not isinstance(item, bytes):
+                item = str(item).encode('ascii')
             result.append(item)
         stream = b'\n'.join(result)
         return b'\n'.join((
@@ -142,11 +142,12 @@ class String(Object):
 
     @property
     def data(self):
-        if isinstance(self.string, str):
+        if not isinstance(self.string, bytes):
             try:
-                encoded_str = self.string.encode('ascii')
+                encoded_str = str(self.string).encode('ascii')
             except UnicodeEncodeError:
-                encoded_str = BOM_UTF16_BE + self.string.encode('utf-16-be')
+                encoded_str = (
+                    BOM_UTF16_BE + str(self.string).encode('utf-16-be'))
             return b'(' + encoded_str + b')'
         return b'(' + self.string + b')'
 
