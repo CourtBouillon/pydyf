@@ -134,7 +134,7 @@ class Stream(Object):
 
 
 class String(Object):
-    def __init__(self, string):
+    def __init__(self, string=''):
         super().__init__()
         self.string = string
 
