@@ -225,8 +225,8 @@ class PDF:
             self.write_line(object_.indirect, output)
 
     def write_cross_reference_table(self, output):
-        self.write_line(b'xref', output)
         self.xref_position = self.current_position
+        self.write_line(b'xref', output)
         self.write_line(f'0 {len(self.objects)}'.encode('ascii'), output)
         for object_ in self.objects:
             self.write_line(
