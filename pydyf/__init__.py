@@ -60,6 +60,9 @@ class Stream(Object):
         self.stream = stream or []
         self.extra = extra or {}
 
+    def begin_text(self):
+        self.stream.append('BT')
+
     def clip(self, even_odd=False):
         self.stream.append('W*' if even_odd else 'W')
 
@@ -71,6 +74,9 @@ class Stream(Object):
 
     def end(self):
         self.stream.append('n')
+
+    def end_text(self):
+        self.stream.append('ET')
 
     def fill(self, even_odd=False):
         self.stream.append('f*' if even_odd else 'f')
@@ -103,17 +109,26 @@ class Stream(Object):
         self.stream.append(
             f'{Array(dash_array).data.decode("ascii")} {dash_phase} d')
 
+    def set_font_size(self, font, size):
+        self.stream.append(f'/{font} {size} Tf')
+
     def set_line_width(self, width):
         self.stream.append(f'{width} w')
 
     def set_state(self, state_name):
         self.stream.append(f'/{state_name} gs')
 
+    def show_text(self, text):
+        self.stream.append(f'[{text}] TJ')
+
     def stroke(self):
         self.stream.append('S')
 
     def stroke_and_close(self):
         self.stream.append('s')
+
+    def text_matrix(self, a, b, c, d, e, f):
+        self.stream.append(f'{a} {b} {c} {d} {e} {f} Tm')
 
     def transform(self, a, b, c, d, e, f):
         self.stream.append(f'{a} {b} {c} {d} {e} {f} cm')
