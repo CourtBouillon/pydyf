@@ -155,14 +155,14 @@ class String(Object):
 
     @property
     def data(self):
-        if not isinstance(self.string, bytes):
-            try:
-                encoded_str = str(self.string).encode('ascii')
-            except UnicodeEncodeError:
-                encoded_str = (
-                    BOM_UTF16_BE + str(self.string).encode('utf-16-be'))
-            return b'(' + encoded_str + b')'
-        return b'(' + self.string + b')'
+        if isinstance(self.string, bytes):
+            return b'(' + self.string + b')'
+        string = str(self.string)
+        try:
+            return b'(' + string.encode('ascii') + b')'
+        except UnicodeEncodeError:
+            encoded = BOM_UTF16_BE + string.encode('utf-16-be')
+            return b'<' + encoded.hex().encode('ascii') + b'>'
 
 
 class Array(Object, list):
