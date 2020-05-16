@@ -9,7 +9,7 @@ import sys
 VERSION = __version__ = '0.0.1'
 
 
-def _to_data(item):
+def _to_bytes(item):
     if isinstance(item, bytes):
         return item
     elif isinstance(item, Object):
@@ -17,6 +17,10 @@ def _to_data(item):
     elif isinstance(item, float) and item.as_integer_ratio()[1] == 1:
         item = int(item)
     return str(item).encode('ascii')
+
+
+def _to_string(item):
+    return _to_bytes(item).decode('ascii')
 
 
 class Object:
@@ -53,7 +57,7 @@ class Dictionary(Object, dict):
     def data(self):
         result = [b'<<']
         for key, value in self.items():
-            result.append(b'/' + _to_data(key) + b' ' + _to_data(value))
+            result.append(b'/' + _to_bytes(key) + b' ' + _to_bytes(value))
         result.append(b'>>')
         return b'\n'.join(result)
 
@@ -74,7 +78,10 @@ class Stream(Object):
         self.stream.append('h')
 
     def curve_to(self, x1, y1, x2, y2, x3, y3):
-        self.stream.append(f'{x1} {y1} {x2} {y2} {x3} {y3} c')
+        self.stream.append(
+            f'{_to_string(x1)} {_to_string(y1)} '
+            f'{_to_string(x2)} {_to_string(y2)} '
+            f'{_to_string(x3)} {_to_string(y3)} c')
 
     def end(self):
         self.stream.append('n')
@@ -92,10 +99,10 @@ class Stream(Object):
         self.stream.append('b*' if even_odd else 'b')
 
     def line_to(self, x, y):
-        self.stream.append(f'{x} {y} l')
+        self.stream.append(f'{_to_string(x)} {_to_string(y)} l')
 
     def move_to(self, x, y):
-        self.stream.append(f'{x} {y} m')
+        self.stream.append(f'{_to_string(x)} {_to_string(y)} m')
 
     def pop_state(self):
         self.stream.append('Q')
@@ -104,26 +111,31 @@ class Stream(Object):
         self.stream.append('q')
 
     def rectangle(self, x, y, width, height):
-        self.stream.append(f'{x} {y} {width} {height} re')
+        self.stream.append(
+            f'{_to_string(x)} {_to_string(y)} '
+            f'{_to_string(width)} {_to_string(height)} re')
 
     def set_color_rgb(self, r, g, b, stroke=False):
-        self.stream.append(f'{r} {g} {b} RG' if stroke else f'{r} {g} {b} rg')
+        self.stream.append(
+            f'{_to_string(r)} {_to_string(g)} {_to_string(b)} ' +
+            ('RG' if stroke else 'rg'))
 
     def set_dash(self, dash_array, dash_phase):
         self.stream.append(
-            f'{Array(dash_array).data.decode("ascii")} {dash_phase} d')
+            f'{Array(dash_array).data.decode("ascii")} '
+            f'{_to_string(dash_phase)} d')
 
     def set_font_size(self, font, size):
-        self.stream.append(f'/{font} {size} Tf')
+        self.stream.append(f'/{_to_string(font)} {_to_string(size)} Tf')
 
     def set_line_width(self, width):
-        self.stream.append(f'{width} w')
+        self.stream.append(f'{_to_string(width)} w')
 
     def set_state(self, state_name):
-        self.stream.append(f'/{state_name} gs')
+        self.stream.append(f'/{_to_string(state_name)} gs')
 
     def show_text(self, text):
-        self.stream.append(f'[{text}] TJ')
+        self.stream.append(f'[{_to_string(text)}] TJ')
 
     def stroke(self):
         self.stream.append('S')
@@ -132,14 +144,18 @@ class Stream(Object):
         self.stream.append('s')
 
     def text_matrix(self, a, b, c, d, e, f):
-        self.stream.append(f'{a} {b} {c} {d} {e} {f} Tm')
+        self.stream.append(
+            f'{_to_string(a)} {_to_string(b)} {_to_string(c)} '
+            f'{_to_string(d)} {_to_string(e)} {_to_string(f)} Tm')
 
     def transform(self, a, b, c, d, e, f):
-        self.stream.append(f'{a} {b} {c} {d} {e} {f} cm')
+        self.stream.append(
+            f'{_to_string(a)} {_to_string(b)} {_to_string(c)} '
+            f'{_to_string(d)} {_to_string(e)} {_to_string(f)} cm')
 
     @property
     def data(self):
-        stream = b'\n'.join(_to_data(item) for item in self.stream)
+        stream = b'\n'.join(_to_bytes(item) for item in self.stream)
         extra = Dictionary(self.extra.copy())
         extra['Length'] = len(stream) + 1
         return b'\n'.join((extra.data, b'stream', stream, b'endstream'))
@@ -153,7 +169,7 @@ class String(Object):
     @property
     def data(self):
         try:
-            return b'(' + _to_data(self.string) + b')'
+            return b'(' + _to_bytes(self.string) + b')'
         except UnicodeEncodeError:
             encoded = BOM_UTF16_BE + str(self.string).encode('utf-16-be')
             return b'<' + encoded.hex().encode('ascii') + b'>'
@@ -168,7 +184,7 @@ class Array(Object, list):
     def data(self):
         result = [b'[']
         for child in self:
-            result.append(_to_data(child))
+            result.append(_to_bytes(child))
         result.append(b']')
         return b' '.join(result)
 
