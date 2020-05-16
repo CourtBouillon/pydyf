@@ -9,6 +9,16 @@ import sys
 VERSION = __version__ = '0.0.1'
 
 
+def _to_data(item):
+    if isinstance(item, bytes):
+        return item
+    elif isinstance(item, Object):
+        return item.data
+    elif isinstance(item, float) and item.as_integer_ratio()[1] == 1:
+        item = int(item)
+    return str(item).encode('ascii')
+
+
 class Object:
     def __init__(self):
         self.number = None
@@ -43,13 +53,7 @@ class Dictionary(Object, dict):
     def data(self):
         result = [b'<<']
         for key, value in self.items():
-            if isinstance(value, Object):
-                value = value.data
-            elif not isinstance(value, bytes):
-                value = str(value).encode('ascii')
-            if not isinstance(key, bytes):
-                key = str(key).encode('ascii')
-            result.append(b'/' + key + b' ' + value)
+            result.append(b'/' + _to_data(key) + b' ' + _to_data(value))
         result.append(b'>>')
         return b'\n'.join(result)
 
@@ -135,14 +139,7 @@ class Stream(Object):
 
     @property
     def data(self):
-        result = []
-        for item in self.stream:
-            if isinstance(item, Object):
-                item = item.data
-            elif not isinstance(item, bytes):
-                item = str(item).encode('ascii')
-            result.append(item)
-        stream = b'\n'.join(result)
+        stream = b'\n'.join(_to_data(item) for item in self.stream)
         extra = Dictionary(self.extra.copy())
         extra['Length'] = len(stream) + 1
         return b'\n'.join((extra.data, b'stream', stream, b'endstream'))
@@ -155,13 +152,10 @@ class String(Object):
 
     @property
     def data(self):
-        if isinstance(self.string, bytes):
-            return b'(' + self.string + b')'
-        string = str(self.string)
         try:
-            return b'(' + string.encode('ascii') + b')'
+            return b'(' + _to_data(self.string) + b')'
         except UnicodeEncodeError:
-            encoded = BOM_UTF16_BE + string.encode('utf-16-be')
+            encoded = BOM_UTF16_BE + str(self.string).encode('utf-16-be')
             return b'<' + encoded.hex().encode('ascii') + b'>'
 
 
@@ -174,11 +168,7 @@ class Array(Object, list):
     def data(self):
         result = [b'[']
         for child in self:
-            if isinstance(child, Object):
-                child = child.data
-            elif not isinstance(child, bytes):
-                child = str(child).encode('ascii')
-            result.append(child)
+            result.append(_to_data(child))
         result.append(b']')
         return b' '.join(result)
 
