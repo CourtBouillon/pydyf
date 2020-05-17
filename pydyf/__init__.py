@@ -83,6 +83,9 @@ class Stream(Object):
             f'{_to_string(x2)} {_to_string(y2)} '
             f'{_to_string(x3)} {_to_string(y3)} c')
 
+    def draw_x_object(self, reference):
+        self.stream.append(f'/{reference} Do')
+
     def end(self):
         self.stream.append('n')
 
