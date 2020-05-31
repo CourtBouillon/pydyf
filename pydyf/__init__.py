@@ -19,10 +19,6 @@ def _to_bytes(item):
     return str(item).encode('ascii')
 
 
-def _to_string(item):
-    return _to_bytes(item).decode('ascii')
-
-
 class Object:
     def __init__(self):
         self.number = None
@@ -34,14 +30,17 @@ class Object:
     @property
     def indirect(self):
         return b'\n'.join((
-            f'{self.number} {self.generation} obj'.encode('ascii'),
+            str(self.number).encode('ascii') + b' ' +
+            str(self.generation).encode('ascii') + b' obj',
             self.data,
             b'endobj',
         ))
 
     @property
     def reference(self):
-        return f'{self.number} {self.generation} R'
+        return (
+            str(self.number).encode('ascii') + b' ' +
+            str(self.generation).encode('ascii') + b' R')
 
     @property
     def data(self):
@@ -69,96 +68,96 @@ class Stream(Object):
         self.extra = extra or {}
 
     def begin_text(self):
-        self.stream.append('BT')
+        self.stream.append(b'BT')
 
     def clip(self, even_odd=False):
-        self.stream.append('W*' if even_odd else 'W')
+        self.stream.append(b'W*' if even_odd else b'W')
 
     def close(self):
-        self.stream.append('h')
+        self.stream.append(b'h')
 
     def curve_to(self, x1, y1, x2, y2, x3, y3):
-        self.stream.append(
-            f'{_to_string(x1)} {_to_string(y1)} '
-            f'{_to_string(x2)} {_to_string(y2)} '
-            f'{_to_string(x3)} {_to_string(y3)} c')
+        self.stream.append(b' '.join((
+            _to_bytes(x1), _to_bytes(y1),
+            _to_bytes(x2), _to_bytes(y2),
+            _to_bytes(x3), _to_bytes(y3), b'c')))
 
     def draw_x_object(self, reference):
-        self.stream.append(f'/{reference} Do')
+        self.stream.append(b'/' + _to_bytes(reference) + b' Do')
 
     def end(self):
-        self.stream.append('n')
+        self.stream.append(b'n')
 
     def end_text(self):
-        self.stream.append('ET')
+        self.stream.append(b'ET')
 
     def fill(self, even_odd=False):
-        self.stream.append('f*' if even_odd else 'f')
+        self.stream.append(b'f*' if even_odd else b'f')
 
     def fill_and_stroke(self, even_odd=False):
-        self.stream.append('B*' if even_odd else 'B')
+        self.stream.append(b'B*' if even_odd else b'B')
 
     def fill_stroke_and_close(self, even_odd=False):
-        self.stream.append('b*' if even_odd else 'b')
+        self.stream.append(b'b*' if even_odd else b'b')
 
     def line_to(self, x, y):
-        self.stream.append(f'{_to_string(x)} {_to_string(y)} l')
+        self.stream.append(b' '.join((_to_bytes(x), _to_bytes(y), b'l')))
 
     def move_to(self, x, y):
-        self.stream.append(f'{_to_string(x)} {_to_string(y)} m')
+        self.stream.append(b' '.join((_to_bytes(x), _to_bytes(y), b'm')))
 
     def pop_state(self):
-        self.stream.append('Q')
+        self.stream.append(b'Q')
 
     def push_state(self):
-        self.stream.append('q')
+        self.stream.append(b'q')
 
     def rectangle(self, x, y, width, height):
-        self.stream.append(
-            f'{_to_string(x)} {_to_string(y)} '
-            f'{_to_string(width)} {_to_string(height)} re')
+        self.stream.append(b' '.join((
+            _to_bytes(x), _to_bytes(y),
+            _to_bytes(width), _to_bytes(height), b're')))
 
     def set_color_rgb(self, r, g, b, stroke=False):
-        self.stream.append(
-            f'{_to_string(r)} {_to_string(g)} {_to_string(b)} ' +
-            ('RG' if stroke else 'rg'))
+        self.stream.append(b' '.join((
+            _to_bytes(r), _to_bytes(g), _to_bytes(b),
+            (b'RG' if stroke else b'rg'))))
 
     def set_dash(self, dash_array, dash_phase):
-        self.stream.append(
-            f'{Array(dash_array).data.decode("ascii")} '
-            f'{_to_string(dash_phase)} d')
+        self.stream.append(b' '.join((
+            Array(dash_array).data, _to_bytes(dash_phase), b'd')))
 
     def set_font_size(self, font, size):
-        self.stream.append(f'/{_to_string(font)} {_to_string(size)} Tf')
+        self.stream.append(
+            b'/' + _to_bytes(font) + b' ' + _to_bytes(size) + b' Tf')
 
     def set_line_width(self, width):
-        self.stream.append(f'{_to_string(width)} w')
+        self.stream.append(_to_bytes(width) + b' w')
 
     def set_state(self, state_name):
-        self.stream.append(f'/{_to_string(state_name)} gs')
+        self.stream.append(b'/' + _to_bytes(state_name) + b' gs')
 
     def show_text(self, text):
-        self.stream.append(f'[{_to_string(text)}] TJ')
+        self.stream.append(b'[' + _to_bytes(text) + b'] TJ')
 
     def stroke(self):
-        self.stream.append('S')
+        self.stream.append(b'S')
 
     def stroke_and_close(self):
-        self.stream.append('s')
+        self.stream.append(b's')
 
     def text_matrix(self, a, b, c, d, e, f):
-        self.stream.append(
-            f'{_to_string(a)} {_to_string(b)} {_to_string(c)} '
-            f'{_to_string(d)} {_to_string(e)} {_to_string(f)} Tm')
+        self.stream.append(b' '.join((
+            _to_bytes(a), _to_bytes(b), _to_bytes(c),
+            _to_bytes(d), _to_bytes(e), _to_bytes(f), b'Tm')))
 
     def transform(self, a, b, c, d, e, f):
-        self.stream.append(
-            f'{_to_string(a)} {_to_string(b)} {_to_string(c)} '
-            f'{_to_string(d)} {_to_string(e)} {_to_string(f)} cm')
+        self.stream.append(b' '.join((
+            _to_bytes(a), _to_bytes(b), _to_bytes(c),
+            _to_bytes(d), _to_bytes(e), _to_bytes(f), b' cm')))
 
     @property
     def data(self):
-        stream = b'\n'.join(_to_bytes(item) for item in self.stream)
+        stream = b'\n'.join(self.stream)
         extra = Dictionary(self.extra.copy())
         extra['Length'] = len(stream) + 1
         return b'\n'.join((extra.data, b'stream', stream, b'endstream'))
