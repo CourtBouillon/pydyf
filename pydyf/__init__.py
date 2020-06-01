@@ -5,6 +5,7 @@ pydyf − Low-level PDF generator
 
 from codecs import BOM_UTF16_BE
 import sys
+import zlib
 
 VERSION = __version__ = '0.0.1'
 
@@ -62,10 +63,11 @@ class Dictionary(Object, dict):
 
 
 class Stream(Object):
-    def __init__(self, stream=None, extra=None):
+    def __init__(self, stream=None, extra=None, compress=False):
         super().__init__()
         self.stream = stream or []
         self.extra = extra or {}
+        self.compress = compress
 
     def begin_text(self):
         self.stream.append(b'BT')
@@ -157,9 +159,14 @@ class Stream(Object):
 
     @property
     def data(self):
-        stream = b'\n'.join(self.stream)
+        stream = b'\n'.join(_to_bytes(item) for item in self.stream)
         extra = Dictionary(self.extra.copy())
         extra['Length'] = len(stream) + 1
+        if self.compress:
+            extra['Filter'] = '/FlateDecode'
+            compressobj = zlib.compressobj()
+            stream = compressobj.compress(stream)
+            stream += compressobj.flush()
         return b'\n'.join((extra.data, b'stream', stream, b'endstream'))
 
 
