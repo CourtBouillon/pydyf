@@ -85,6 +85,10 @@ class Stream(Object):
     def close(self):
         self.stream.append(b'h')
 
+    def color_space(self, space, stroke=False):
+        self.stream.append(
+            b'/' + _to_bytes(space) + b' ' + (b'CS' if stroke else b'cs'))
+
     def curve_to(self, x1, y1, x2, y2, x3, y3):
         self.stream.append(b' '.join((
             _to_bytes(x1), _to_bytes(y1),
@@ -115,6 +119,9 @@ class Stream(Object):
     def move_to(self, x, y):
         self.stream.append(b' '.join((_to_bytes(x), _to_bytes(y), b'm')))
 
+    def shading(self, name):
+        self.stream.append(b'/' + _to_bytes(name) + b' sh')
+
     def pop_state(self):
         self.stream.append(b'Q')
 
@@ -130,6 +137,10 @@ class Stream(Object):
         self.stream.append(b' '.join((
             _to_bytes(r), _to_bytes(g), _to_bytes(b),
             (b'RG' if stroke else b'rg'))))
+
+    def set_color_special(self, name, stroke=False):
+        self.stream.append(
+            b'/' + _to_bytes(name) + b' ' + (b'SCN' if stroke else b'scn'))
 
     def set_dash(self, dash_array, dash_phase):
         self.stream.append(b' '.join((
