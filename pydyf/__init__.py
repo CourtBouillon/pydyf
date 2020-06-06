@@ -20,9 +20,9 @@ def _to_bytes(item):
             item = int(item)
         elif abs(item) < 10**-10:
             item = 0
-        elif abs(item) > 10**10:
+        elif item > 10**10:
             item = 10**10
-        elif abs(item) < -10**10:
+        elif item < -10**10:
             item = -10**10
     return str(item).encode('ascii')
 
