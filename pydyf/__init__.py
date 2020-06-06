@@ -15,8 +15,15 @@ def _to_bytes(item):
         return item
     elif isinstance(item, Object):
         return item.data
-    elif isinstance(item, float) and item.as_integer_ratio()[1] == 1:
-        item = int(item)
+    elif isinstance(item, float):
+        if item.as_integer_ratio()[1] == 1:
+            item = int(item)
+        elif abs(item) < 10**-10:
+            item = 0
+        elif abs(item) > 10**10:
+            item = 10**10
+        elif abs(item) < -10**10:
+            item = -10**10
     return str(item).encode('ascii')
 
 
