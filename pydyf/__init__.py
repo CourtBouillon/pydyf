@@ -179,12 +179,12 @@ class Stream(Object):
     def data(self):
         stream = b'\n'.join(_to_bytes(item) for item in self.stream)
         extra = Dictionary(self.extra.copy())
-        extra['Length'] = len(stream) + 1
         if self.compress:
             extra['Filter'] = '/FlateDecode'
             compressobj = zlib.compressobj()
             stream = compressobj.compress(stream)
             stream += compressobj.flush()
+        extra['Length'] = len(stream) + 1
         return b'\n'.join((extra.data, b'stream', stream, b'endstream'))
 
 
