@@ -18,12 +18,8 @@ def _to_bytes(item):
     elif isinstance(item, float):
         if item.as_integer_ratio()[1] == 1:
             item = int(item)
-        elif abs(item) < 10**-10:
-            item = 0
-        elif item > 10**10:
-            item = 10**10
-        elif item < -10**10:
-            item = -10**10
+    if isinstance(item, int):
+        return f'{item:d}'.encode('ascii')
     return str(item).encode('ascii')
 
 
