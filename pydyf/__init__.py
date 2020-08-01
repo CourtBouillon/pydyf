@@ -169,7 +169,7 @@ class Stream(Object):
     def transform(self, a, b, c, d, e, f):
         self.stream.append(b' '.join((
             _to_bytes(a), _to_bytes(b), _to_bytes(c),
-            _to_bytes(d), _to_bytes(e), _to_bytes(f), b' cm')))
+            _to_bytes(d), _to_bytes(e), _to_bytes(f), b'cm')))
 
     @property
     def data(self):
