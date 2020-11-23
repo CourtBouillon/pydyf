@@ -25,3 +25,6 @@ classifiers = [
   'Programming Language :: Python :: Implementation :: CPython',
   'Programming Language :: Python :: Implementation :: PyPy',
 ]
+
+[tool.flit.metadata.requires-extra]
+doc = ['sphinx', 'sphinx_rtd_theme']
