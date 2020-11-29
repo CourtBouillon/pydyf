@@ -15,4 +15,22 @@ pydyf with pip_::
 .. _pip: https://pip.pypa.io/
 
 
-TODO
+Create a PDF
+------------
+
+.. code-block:: python
+
+   import pydyf
+
+   document = pydyf.PDF()
+
+   # Add an empty page
+   document.add_page(pydyf.Dictionary({
+       'Type': '/Page',
+       'Parent': document.pages.reference,
+       'MediaBox': pydyf.Array([0, 0, 200, 200]),
+   }))
+
+   # Write to document.pdf
+   with open('document.pdf', 'wb') as f:
+       document.write(f)
