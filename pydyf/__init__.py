@@ -27,36 +27,16 @@ def _to_bytes(item):
 
 
 class Object:
-    """Base class for PDF objects. Every object inherit from it.
-
-    .. attribute:: number
-
-        Number of the object.
-
-    .. attribute:: offset
-
-        Position in the PDF of the object.
-
-    .. attribute:: generation
-
-        Version number of the object, non-negative.
-
-    .. attribute:: free
-
-        Indicate if an object is used `n` or has been deleted `f` and
-        therefore is free.
-
-    .. automethod:: indirect
-
-    .. automethod:: reference
-
-    .. automethod:: data
-
-    """
+    """Base class for PDF objects."""
     def __init__(self):
+        #: Number of the object.
         self.number = None
+        #: Position in the PDF of the object.
         self.offset = 0
+        #: Version number of the object, non-negative.
         self.generation = 0
+        #: Indicate if an object is used (``'n'``), or has been deleted
+        #: and therefore is free (``'f'``).
         self.free = 'n'
         self._indirect = None
 
@@ -84,10 +64,9 @@ class Object:
 
 
 class Dictionary(Object, dict):
-    """PDF Dictionary object. Inherit from Python dict.
+    """PDF Dictionary object.
 
-    .. attribute:: values
-        Python dict
+    Inherits from :class:`Object` and Python :obj:`dict`.
 
     """
     def __init__(self, values=None):
@@ -106,49 +85,16 @@ class Dictionary(Object, dict):
 class Stream(Object):
     """PDF Stream object.
 
-    .. attribute:: stream
-        Python array
-
-    .. attribute:: extra
-        Metadata containing at least the lenght of the Stream.
-
-    .. attribute:: compress
-        Compress the stream data if set to True. Default False.
-
-    .. automethod:: begin_text
-    .. automethod:: clip
-    .. automethod:: close
-    .. automethod:: color_space
-    .. automethod:: curve_to
-    .. automethod:: draw_x_object
-    .. automethod:: end
-    .. automethod:: end_text
-    .. automethod:: fill
-    .. automethod:: fill_and_stroke
-    .. automethod:: fill_stroke_and_close
-    .. automethod:: line_to
-    .. automethod:: move_to
-    .. automethod:: shading
-    .. automethod:: pop_state
-    .. automethod:: push_state
-    .. automethod:: rectangle
-    .. automethod:: set_color_rgb
-    .. automethod:: set_color_special
-    .. automethod:: set_dash
-    .. automethod:: set_font_size
-    .. automethod:: set_line_width
-    .. automethod:: set_state
-    .. automethod:: show_text
-    .. automethod:: stroke
-    .. automethod:: stroke_and_close
-    .. automethod:: text_matrix
-    .. automethod:: transform
+    Inherits from :class:`Object`.
 
     """
     def __init__(self, stream=None, extra=None, compress=False):
         super().__init__()
+        #: Python array of data composing stream.
         self.stream = stream or []
+        #: Metadata containing at least the length of the Stream.
         self.extra = extra or {}
+        #: Compress the stream data if set to ``True``. Default is ``False``.
         self.compress = compress
 
     def begin_text(self):
@@ -156,39 +102,48 @@ class Stream(Object):
         self.stream.append(b'BT')
 
     def clip(self, even_odd=False):
-        """Modify the current clipping path by intersecting it with the
-        current path.
+        """Modify current clipping path by intersecting it with current path.
 
         Use the nonzero winding number rule to determine which regions lie
         inside the clipping path by default.
-        Use the even-odd rule if even_odd set to True.
+
+        Use the even-odd rule if ``even_odd`` set to ``True``.
+
         """
         self.stream.append(b'W*' if even_odd else b'W')
 
     def close(self):
-        """Close the current subpath by appending a straight line segment from
-        the current point to the starting point of the subpath.
+        """Close current subpath.
+
+        Append a straight line segment from the current point to the starting
+        point of the subpath.
+
         """
         self.stream.append(b'h')
 
     def color_space(self, space, stroke=False):
-        """Set the nonstroking color space. If stroke is set to True, set the
-        stroking color space."""
+        """Set the nonstroking color space.
+
+        If stroke is set to ``True``, set the stroking color space instead.
+
+        """
         self.stream.append(
             b'/' + _to_bytes(space) + b' ' + (b'CS' if stroke else b'cs'))
 
     def curve_to(self, x1, y1, x2, y2, x3, y3):
-        """Add a cubic Bézier curve to the current path.
+        """Add cubic Bézier curve to current path.
 
-        The curve shall extend from (x3, y3) using (x1, y1) and (x2, y2) as the
-        Bézier control points."""
+        The curve shall extend from ``(x3, y3)`` using ``(x1, y1)`` and ``(x2,
+        y2)`` as the Bézier control points.
+
+        """
         self.stream.append(b' '.join((
             _to_bytes(x1), _to_bytes(y1),
             _to_bytes(x2), _to_bytes(y2),
             _to_bytes(x3), _to_bytes(y3), b'c')))
 
     def draw_x_object(self, reference):
-        """Draw the object given by reference."""
+        """Draw object given by reference."""
         self.stream.append(b'/' + _to_bytes(reference) + b' Do')
 
     def end(self):
@@ -200,31 +155,39 @@ class Stream(Object):
         self.stream.append(b'ET')
 
     def fill(self, even_odd=False):
-        """Fill path using nonzero winding rule. Use even-odd rule if even_odd
-        is set to True."""
+        """Fill path using nonzero winding rule.
+
+        Use even-odd rule if ``even_odd`` is set to ``True``.
+
+        """
         self.stream.append(b'f*' if even_odd else b'f')
 
     def fill_and_stroke(self, even_odd=False):
-        """Fill and stroke path usign nonzero winding rule. Use even-odd rule
-        if even_odd is set to True."""
+        """Fill and stroke path usign nonzero winding rule.
+
+        Use even-odd rule if ``even_odd`` is set to ``True``.
+
+        """
         self.stream.append(b'B*' if even_odd else b'B')
 
     def fill_stroke_and_close(self, even_odd=False):
-        """Fill, stroke and close path using nonzero winding rule. Use
-        even-odd rule if even_odd is set to True."""
+        """Fill, stroke and close path using nonzero winding rule.
+
+        Use even-odd rule if ``even_odd`` is set to ``True``.
+
+        """
         self.stream.append(b'b*' if even_odd else b'b')
 
     def line_to(self, x, y):
-        """Add a line from the current point to the point (x, y)."""
+        """Add line from current point to point ``(x, y)``."""
         self.stream.append(b' '.join((_to_bytes(x), _to_bytes(y), b'l')))
 
     def move_to(self, x, y):
-        """Begin a new subpath by moving the current point to (x, y)."""
+        """Begin new subpath by moving current point to ``(x, y)``."""
         self.stream.append(b' '.join((_to_bytes(x), _to_bytes(y), b'm')))
 
     def shading(self, name):
-        """Paint the shape and color shading described by the shading
-        dictionary `name`."""
+        """Paint shape and color shading using shading dictionary ``name``."""
         self.stream.append(b'/' + _to_bytes(name) + b' sh')
 
     def pop_state(self):
@@ -236,54 +199,68 @@ class Stream(Object):
         self.stream.append(b'q')
 
     def rectangle(self, x, y, width, height):
-        """Add a rectangle to the current path as a complete subpath.
+        """Add rectangle to current path as complete subpath.
 
-        (x, y) is the lower-left corner and width and height the dimensions.
+        ``(x, y)`` is the lower-left corner and width and height the
+        dimensions.
+
         """
         self.stream.append(b' '.join((
             _to_bytes(x), _to_bytes(y),
             _to_bytes(width), _to_bytes(height), b're')))
 
     def set_color_rgb(self, r, g, b, stroke=False):
-        """Set RGB color for nonstroking operations, for stroking operations if
-        stroke is set to True."""
+        """Set RGB color for nonstroking operations.
+
+        Set RGB color for stroking operations instead if ``stroke`` is set to
+        ``True``.
+
+        """
         self.stream.append(b' '.join((
             _to_bytes(r), _to_bytes(g), _to_bytes(b),
             (b'RG' if stroke else b'rg'))))
 
     def set_color_special(self, name, stroke=False):
-        """Set color for nonstroking operations, for stroking operation if
-        stroke is set to True."""
+        """Set color for nonstroking operations.
+
+        Set color for stroking operation if ``stroke`` is set to ``True``.
+
+        """
         self.stream.append(
             b'/' + _to_bytes(name) + b' ' + (b'SCN' if stroke else b'scn'))
 
     def set_dash(self, dash_array, dash_phase):
-        """Set the dash line pattern.
+        """Set dash line pattern.
 
-        :param dash_array: Array defining the dash pattern
-        :param dash_phase: Integer defining the start of the dash phase
+        :param dash_array: Dash pattern.
+        :type dash_array: :term:`iterable`
+        :param dash_phase: Start of dash phase.
+        :type dash_phase: :obj:`int`
+
         """
         self.stream.append(b' '.join((
             Array(dash_array).data, _to_bytes(dash_phase), b'd')))
 
     def set_font_size(self, font, size):
-        """Set the font and its size."""
+        """Set font name and size."""
         self.stream.append(
             b'/' + _to_bytes(font) + b' ' + _to_bytes(size) + b' Tf')
 
     def set_line_width(self, width):
-        """Set the line width."""
+        """Set line width."""
         self.stream.append(_to_bytes(width) + b' w')
 
     def set_state(self, state_name):
-        """Set the specified parameters in the graphic state.
+        """Set specified parameters in graphic state.
 
-        :param state_name: graphic state parameter dictionary
+        :param state_name: Graphic state.
+        :type state_name: :obj:`dict`
+
         """
         self.stream.append(b'/' + _to_bytes(state_name) + b' gs')
 
     def show_text(self, text):
-        """Show a text."""
+        """Show text."""
         self.stream.append(b'[' + _to_bytes(text) + b'] TJ')
 
     def stroke(self):
@@ -297,27 +274,40 @@ class Stream(Object):
     def text_matrix(self, a, b, c, d, e, f):
         """Set text matrix and text line matrix.
 
-        :param a: top left number in the matrix
-        :param b: top middle number in the matrix
-        :param c: middle left number in the matrix
-        :param d: middle middle number in the matrix
-        :param e: bottom left number in the matrix
-        :param f: bottom middle number in the matrix
+        :param a: Top left number in the matrix.
+        :type a: :obj:`int` or :obj:`float`
+        :param b: Top middle number in the matrix.
+        :type b: :obj:`int` or :obj:`float`
+        :param c: Middle left number in the matrix.
+        :type c: :obj:`int` or :obj:`float`
+        :param d: Middle middle number in the matrix.
+        :type d: :obj:`int` or :obj:`float`
+        :param e: Bottom left number in the matrix.
+        :type e: :obj:`int` or :obj:`float`
+        :param f: Bottom middle number in the matrix.
+        :type f: :obj:`int` or :obj:`float`
+
         """
         self.stream.append(b' '.join((
             _to_bytes(a), _to_bytes(b), _to_bytes(c),
             _to_bytes(d), _to_bytes(e), _to_bytes(f), b'Tm')))
 
     def transform(self, a, b, c, d, e, f):
-        """Modify the current transformation matrix by concatenating the
-        specify matrix.
+        """Modify current transformation matrix.
 
-        :param a: top left number in the matrix
-        :param b: top middle number in the matrix
-        :param c: middle left number in the matrix
-        :param d: middle middle number in the matrix
-        :param e: bottom left number in the matrix
-        :param f: bottom middle number in the matrix
+        :param a: Top left number in the matrix.
+        :type a: :obj:`int` or :obj:`float`
+        :param b: Top middle number in the matrix.
+        :type b: :obj:`int` or :obj:`float`
+        :param c: Middle left number in the matrix.
+        :type c: :obj:`int` or :obj:`float`
+        :param d: Middle middle number in the matrix.
+        :type d: :obj:`int` or :obj:`float`
+        :param e: Bottom left number in the matrix.
+        :type e: :obj:`int` or :obj:`float`
+        :param f: Bottom middle number in the matrix.
+        :type f: :obj:`int` or :obj:`float`
+
         """
         self.stream.append(b' '.join((
             _to_bytes(a), _to_bytes(b), _to_bytes(c),
@@ -339,11 +329,12 @@ class Stream(Object):
 class String(Object):
     """PDF String object.
 
-    .. attribute:: string
-        Classic string.
+    Inherits from :class:`Object`.
+
     """
     def __init__(self, string=''):
         super().__init__()
+        #: Unicode string.
         self.string = string
 
     @property
@@ -356,10 +347,10 @@ class String(Object):
 
 
 class Array(Object, list):
-    """PDF Array object. Inherit from list.
+    """PDF Array object.
 
-    .. attribute:: array
-        Python array.
+    Inherits from :class:`Object` and Python :obj:`list`.
+
     """
     def __init__(self, array=None):
         Object.__init__(self)
@@ -375,47 +366,9 @@ class Array(Object, list):
 
 
 class PDF:
-    """The PDF class.
-
-    .. attribute:: objects
-
-        Python array containing the objects of the PDF.
-
-    .. attribute:: zero_object
-
-        A PDF object which is the head of the list of free objects.
-
-    .. attribute:: pages
-
-        PDF dictionary containing the pages of the PDF.
-
-    .. attribute:: info
-
-        PDF dictionary containing the metadatas of the PDF.
-
-    .. attribute:: catalog
-
-        PDF dictionary containing references to the other objects.
-
-    .. attribute:: current_position
-
-        Current position in the PDF.
-
-    .. attribute:: xref_position
-
-        Position of the cross reference table.
-
-    .. automethod:: add_page
-    .. automethod:: add_object
-    .. automethod:: write_line
-    .. automethod:: write_object
-    .. automethod:: write_header
-    .. automethod:: write_body
-    .. automethod:: write_cross_reference_table
-    .. automethod:: write_trailer
-    .. automethod:: write
-    """
+    """PDF document."""
     def __init__(self):
+        #: Python :obj:`list` containing the PDF’s objects.
         self.objects = []
 
         zero_object = Object()
@@ -424,6 +377,7 @@ class PDF:
         zero_object._indirect = ''
         self.add_object(zero_object)
 
+        #: PDF :class:`Dictionary` containing the PDF’s pages.
         self.pages = Dictionary({
             'Type': '/Pages',
             'Kids': Array([]),
@@ -431,54 +385,61 @@ class PDF:
         })
         self.add_object(self.pages)
 
+        #: PDF :class:`Dictionary` containing the PDF’s metadata.
         self.info = Dictionary({})
         self.add_object(self.info)
 
+        #: PDF :class:`Dictionary` containing references to the other objects.
         self.catalog = Dictionary({
             'Type': '/Catalog',
             'Pages': self.pages.reference,
         })
         self.add_object(self.catalog)
 
+        #: Current position in the PDF.
         self.current_position = 0
+        #: Position of the cross reference table.
         self.xref_position = None
 
     def add_page(self, page):
-        """Add a page to the PDF.
+        """Add page to the PDF.
 
-        :param page: PDF dictionary of the page.
+        :param page: New page.
+        :type page: :class:`Dictionary`
+
         """
         self.pages['Count'] += 1
         self.add_object(page)
         self.pages['Kids'].extend([page.number, 0, 'R'])
 
     def add_object(self, object_):
-        """Add an object into the PDF."""
+        """Add object to the PDF."""
         object_.number = len(self.objects)
         self.objects.append(object_)
 
     def write_line(self, content, output):
-        """Write a line into the output.
+        """Write line to output.
 
-        :param content: content to write
-        :param output: output
+        :param content: Content to write.
+        :type content: :obj:`bytes`
+        :param output: Output stream.
+        :type output: :term:`file object`
+
         """
         self.current_position += len(content) + 1
         output.write(content + b'\n')
 
     def write_object(self, object_, output):
-        """Write an object into the output."""
+        """Write object to output."""
         for line in object_.data.split(b'\n'):
             self.write_line(line, output)
 
     def write_header(self, output):
-        """Write the PDF header into the output."""
+        """Write PDF header to output."""
         self.write_line(b'%PDF-1.7', output)
 
     def write_body(self, output):
-        """Write all the objects of the PDF into the output.
-        Except free objects.
-        """
+        """Write all non-free PDF objects to output."""
         for object_ in self.objects:
             if object_.free == 'f':
                 continue
@@ -486,7 +447,7 @@ class PDF:
             self.write_line(object_.indirect, output)
 
     def write_cross_reference_table(self, output):
-        """Write the cross reference table into the output."""
+        """Write cross reference table to output."""
         self.xref_position = self.current_position
         self.write_line(b'xref', output)
         self.write_line(f'0 {len(self.objects)}'.encode('ascii'), output)
@@ -497,7 +458,7 @@ class PDF:
             )
 
     def write_trailer(self, output):
-        """Write the trailer into the output."""
+        """Write trailer to output."""
         self.write_line(b'trailer', output)
         self.write_object(Dictionary({
             'Size': len(self.objects),
@@ -509,9 +470,11 @@ class PDF:
         self.write_line(b'%%EOF', output)
 
     def write(self, output=sys.stdout.buffer):
-        """Write the PDF into the output.
+        """Write PDF to output.
 
-        :param output: the output, by default stdout.
+        :param output: Output stream, :obj:`sys.stdout` by default.
+        :type output: :term:`file object`
+
         """
         self.write_header(output)
         self.write_body(output)

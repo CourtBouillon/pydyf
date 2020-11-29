@@ -3,14 +3,13 @@ API Reference
 
 .. module:: pydyf
 
-.. autofunction:: _to_bytes
-
 .. autoclass:: Object
+   :members:
 
 .. autoclass:: Dictionary
 
 .. autoclass:: Stream
-  :members:
+   :members:
 
 .. autoclass:: String
 
