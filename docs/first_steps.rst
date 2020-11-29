@@ -9,7 +9,7 @@ The easiest way to use pydyf is to install it in a Python `virtual
 environment`_. When your virtual environment is activated, you can then install
 pydyf with pip_::
 
-    pip install pydyf
+    pip install git+https://github.com/CourtBouillon/pydyf.git
 
 .. _virtual environment: https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/
 .. _pip: https://pip.pypa.io/
