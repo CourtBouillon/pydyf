@@ -38,7 +38,6 @@ class Object:
         #: Indicate if an object is used (``'n'``), or has been deleted
         #: and therefore is free (``'f'``).
         self.free = 'n'
-        self._indirect = None
 
     @property
     def indirect(self):
@@ -374,7 +373,6 @@ class PDF:
         zero_object = Object()
         zero_object.generation = 65535
         zero_object.free = 'f'
-        zero_object._indirect = ''
         self.add_object(zero_object)
 
         #: PDF :class:`Dictionary` containing the PDF’s pages.
