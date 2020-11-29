@@ -381,6 +381,10 @@ class PDF:
 
         Python array containing the objects of the PDF.
 
+    .. attribute:: zero_object
+
+        A PDF object which is the head of the list of free objects.
+
     .. attribute:: pages
 
         PDF dictionary containing the pages of the PDF.
