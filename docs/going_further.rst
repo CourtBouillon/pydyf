@@ -5,7 +5,17 @@ Going Further
 Why pydyf?
 -------------
 
-TODO
+pydyf has been created to replace Cairo PDF generation in WeasyPrint_.
+
+Indeed, there are some bugs in WeasyPrint caused by Cairo_ and Cairo has some
+difficulties to make releases.
+Also there are features which will be easier to implement while having more
+control on the PDF generation.
+
+So we created pydyf.
+
+.. _WeasyPrint: https://www.courtbouillon/weasyprint
+.. _Cairo: https://www.cairographics.org/
 
 Why Python?
 -----------
