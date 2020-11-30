@@ -14,7 +14,7 @@ control on the PDF generation.
 
 So we created pydyf.
 
-.. _WeasyPrint: https://www.courtbouillon/weasyprint
+.. _WeasyPrint: https://www.courtbouillon.org/weasyprint
 .. _Cairo: https://www.cairographics.org/
 
 Why Python?
