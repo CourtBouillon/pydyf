@@ -3,9 +3,9 @@ pydyf − Low-level PDF generator
 
 """
 
-from codecs import BOM_UTF16_BE
 import sys
 import zlib
+from codecs import BOM_UTF16_BE
 
 VERSION = __version__ = '0.0.1'
 
