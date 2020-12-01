@@ -24,6 +24,9 @@ jobs:
       - name: Install Ghostscript (macOS)
         if: matrix.os == 'macos-latest'
         run: brew install ghostscript
+      - name: Installe Ghostscript (Windows)
+        if: matrix.os == 'windows-latest'
+        run: choco install -y --no-progress ghostscript
       - name: Upgrade pip and setuptools
         run: python -m pip install --upgrade pip setuptools
       - name: Install tests's requirements
