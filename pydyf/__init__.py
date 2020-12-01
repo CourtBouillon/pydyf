@@ -252,8 +252,7 @@ class Stream(Object):
     def set_state(self, state_name):
         """Set specified parameters in graphic state.
 
-        :param state_name: Graphic state.
-        :type state_name: :obj:`dict`
+        :param state_name: Name of the graphic state.
 
         """
         self.stream.append(b'/' + _to_bytes(state_name) + b' gs')
