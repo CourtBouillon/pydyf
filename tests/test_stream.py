@@ -35,7 +35,14 @@ def test_fill():
 def test_stroke():
     document = pydyf.PDF()
 
+    graphic_state = pydyf.Dictionary({
+        'Type': '/ExtGState',
+        'SA': 'true',
+    })
+    document.add_object(graphic_state)
+
     draw = pydyf.Stream()
+    draw.set_state('GS1')
     draw.rectangle(2, 2, 5, 6)
     draw.set_line_width(2)
     draw.stroke()
@@ -46,6 +53,9 @@ def test_stroke():
         'Parent': document.pages.reference,
         'Contents': draw.reference,
         'MediaBox': pydyf.Array([0, 0, 10, 10]),
+        'Resources': pydyf.Dictionary({
+            'ExtGState': pydyf.Dictionary({'GS1': graphic_state.reference}),
+        }),
     }))
 
     assert_pixels(document, '''
