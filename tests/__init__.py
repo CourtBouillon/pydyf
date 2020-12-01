@@ -28,7 +28,7 @@ def document_to_png(document, target=None, resolution=72, antialiasing=1):
         'gs', '-q', '-sstdout=%stderr', '-dNOPAUSE', '-dSAFER',
         f'-dTextAlphaBits={antialiasing}',
         f'-dGraphicsAlphaBits={antialiasing}', '-sDEVICE=png16m',
-        f'-r{resolution}', '-sOutputFile=-', '-']
+        f'-r{resolution * 8}', '-dDownScaleFactor=8', '-sOutputFile=-', '-']
     command = run(command, input=output.getvalue(), stdout=PIPE)
     pngs = command.stdout
     magic_number = b'\x89\x50\x4e\x47\x0d\x0a\x1a\x0a'
