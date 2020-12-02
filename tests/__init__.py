@@ -25,8 +25,9 @@ def document_to_png(document, target=None, resolution=72, antialiasing=1):
     # TODO: don’t crash if GhostScript can’t be found
     # TODO: fix that for Windows
     command = [
-        'gs', '-q', '-sstdout=%stderr', '-dNOPAUSE', '-dSAFER',
-        f'-dTextAlphaBits={antialiasing}',
+        'gs', '-q',
+        '-sstdout=%%stderr' if os.name == 'nt' else '-sstdout=%stderr',
+        '-dNOPAUSE', '-dSAFER', f'-dTextAlphaBits={antialiasing}',
         f'-dGraphicsAlphaBits={antialiasing}', '-sDEVICE=png16m',
         f'-r{resolution * 8}', '-dDownScaleFactor=8', '-sOutputFile=-', '-']
     command = run(command, input=output.getvalue(), stdout=PIPE)
