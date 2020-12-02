@@ -36,7 +36,6 @@ Draw rectangles and lines
    draw.set_line_width(10)
    draw.transform(1, 0, 0, 1, 80, 80)
    draw.fill()
-   draw.stroke()
 
    # Add the stream with the two rectangles into the document
    document.add_object(draw)
@@ -76,7 +75,6 @@ Add some color
    draw.set_line_width(10)
    draw.transform(1, 0, 0, 1, 80, 80)
    draw.fill()
-   draw.stroke()
 
    document.add_object(draw)
 
