@@ -93,7 +93,7 @@ def test_line_to():
     ''')
 
 
-def test_set_color_rgb():
+def test_set_color_rgb_stroke():
     document = pydyf.PDF()
 
     draw = pydyf.Stream()
@@ -123,6 +123,8 @@ def test_set_color_rgb():
         __________
     ''')
 
+
+def test_set_color_rgb_fill():
     document = pydyf.PDF()
 
     draw = pydyf.Stream()
@@ -313,5 +315,214 @@ def test_fill_and_stroke():
         _BBKKKBB__
         _BBBBBBB__
         _BBBBBBB__
+        __________
+    ''')
+
+
+def test_clip():
+    document = pydyf.PDF()
+
+    draw = pydyf.Stream()
+    draw.rectangle(3, 3, 5, 6)
+    draw.rectangle(4, 3, 2, 6)
+    draw.clip()
+    draw.end()
+    draw.move_to(0, 5)
+    draw.line_to(10, 5)
+    draw.set_color_rgb(255, 0, 0, stroke=True)
+    draw.set_line_width(2)
+    draw.stroke()
+    document.add_object(draw)
+
+    document.add_page(pydyf.Dictionary({
+        'Type': '/Page',
+        'Parent': document.pages.reference,
+        'Contents': draw.reference,
+        'MediaBox': pydyf.Array([0, 0, 10, 10]),
+    }))
+
+    assert_pixels(document, '''
+        __________
+        __________
+        __________
+        __________
+        ___RRRRR__
+        ___RRRRR__
+        __________
+        __________
+        __________
+        __________
+    ''')
+
+
+def test_clip_even_odd():
+    document = pydyf.PDF()
+
+    draw = pydyf.Stream()
+    draw.rectangle(3, 3, 5, 6)
+    draw.rectangle(4, 3, 2, 6)
+    draw.clip(even_odd=True)
+    draw.end()
+    draw.move_to(0, 5)
+    draw.line_to(10, 5)
+    draw.set_color_rgb(255, 0, 0, stroke=True)
+    draw.set_line_width(2)
+    draw.stroke()
+    document.add_object(draw)
+
+    document.add_page(pydyf.Dictionary({
+        'Type': '/Page',
+        'Parent': document.pages.reference,
+        'Contents': draw.reference,
+        'MediaBox': pydyf.Array([0, 0, 10, 10]),
+    }))
+
+    assert_pixels(document, '''
+        __________
+        __________
+        __________
+        __________
+        ___R__RR__
+        ___R__RR__
+        __________
+        __________
+        __________
+        __________
+    ''')
+
+
+def test_close():
+    document = pydyf.PDF()
+
+    draw = pydyf.Stream()
+    draw.move_to(2, 2)
+    draw.line_to(2, 8)
+    draw.line_to(7, 8)
+    draw.line_to(7, 2)
+    draw.close()
+    draw.set_color_rgb(0, 0, 255, stroke=True)
+    draw.set_line_width(2)
+    draw.stroke()
+    document.add_object(draw)
+
+    document.add_page(pydyf.Dictionary({
+        'Type': '/Page',
+        'Parent': document.pages.reference,
+        'Contents': draw.reference,
+        'MediaBox': pydyf.Array([0, 0, 10, 10]),
+    }))
+
+    assert_pixels(document, '''
+        __________
+        _BBBBBBB__
+        _BBBBBBB__
+        _BB___BB__
+        _BB___BB__
+        _BB___BB__
+        _BB___BB__
+        _BBBBBBB__
+        _BBBBBBB__
+        __________
+    ''')
+
+
+def test_stroke_and_close():
+    document = pydyf.PDF()
+
+    draw = pydyf.Stream()
+    draw.move_to(2, 2)
+    draw.line_to(2, 8)
+    draw.line_to(7, 8)
+    draw.line_to(7, 2)
+    draw.set_color_rgb(0, 0, 255, stroke=True)
+    draw.set_line_width(2)
+    draw.stroke_and_close()
+    document.add_object(draw)
+
+    document.add_page(pydyf.Dictionary({
+        'Type': '/Page',
+        'Parent': document.pages.reference,
+        'Contents': draw.reference,
+        'MediaBox': pydyf.Array([0, 0, 10, 10]),
+    }))
+
+    assert_pixels(document, '''
+        __________
+        _BBBBBBB__
+        _BBBBBBB__
+        _BB___BB__
+        _BB___BB__
+        _BB___BB__
+        _BB___BB__
+        _BBBBBBB__
+        _BBBBBBB__
+        __________
+    ''')
+
+
+def test_fill_stroke_and_close():
+    document = pydyf.PDF()
+
+    draw = pydyf.Stream()
+    draw.move_to(2, 2)
+    draw.line_to(2, 8)
+    draw.line_to(7, 8)
+    draw.line_to(7, 2)
+    draw.set_color_rgb(255, 0, 0)
+    draw.set_color_rgb(0, 0, 255, stroke=True)
+    draw.set_line_width(2)
+    draw.fill_stroke_and_close()
+    document.add_object(draw)
+
+    document.add_page(pydyf.Dictionary({
+        'Type': '/Page',
+        'Parent': document.pages.reference,
+        'Contents': draw.reference,
+        'MediaBox': pydyf.Array([0, 0, 10, 10]),
+    }))
+
+    assert_pixels(document, '''
+        __________
+        _BBBBBBB__
+        _BBBBBBB__
+        _BBRRRBB__
+        _BBRRRBB__
+        _BBRRRBB__
+        _BBRRRBB__
+        _BBBBBBB__
+        _BBBBBBB__
+        __________
+    ''')
+
+
+def test_push_pop_state():
+    document = pydyf.PDF()
+
+    draw = pydyf.Stream()
+    draw.rectangle(2, 2, 5, 6)
+    draw.push_state()
+    draw.rectangle(4, 4, 2, 2)
+    draw.set_color_rgb(255, 0, 0)
+    draw.pop_state()
+    draw.fill()
+    document.add_object(draw)
+
+    document.add_page(pydyf.Dictionary({
+        'Type': '/Page',
+        'Parent': document.pages.reference,
+        'Contents': draw.reference,
+        'MediaBox': pydyf.Array([0, 0, 10, 10]),
+    }))
+
+    assert_pixels(document, '''
+        __________
+        __________
+        __KKKKK___
+        __KKKKK___
+        __KKKKK___
+        __KKKKK___
+        __KKKKK___
+        __KKKKK___
+        __________
         __________
     ''')
