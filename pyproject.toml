@@ -38,7 +38,7 @@ branch = true
 include = ['tests/*', 'pydyf/*']
 
 [tool.coverage.report]
-exclude_lines = ['pragma: no cover', 'def __repr__', 'raiseNotImplementedError']
+exclude_lines = ['pragma: no cover', 'def __repr__', 'raise NotImplementedError']
 omit = ['.*']
 
 [tool.isort]
