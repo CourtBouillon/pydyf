@@ -526,3 +526,68 @@ def test_push_pop_state():
         __________
         __________
     ''')
+
+
+def test_types():
+    document = pydyf.PDF()
+
+    draw = pydyf.Stream()
+    draw.rectangle(2, 2.0, '5', b'6')
+    draw.set_line_width(2.3456)
+    draw.fill()
+    document.add_object(draw)
+
+    document.add_page(pydyf.Dictionary({
+        'Type': '/Page',
+        'Parent': document.pages.reference,
+        'Contents': draw.reference,
+        'MediaBox': pydyf.Array([0, 0, 10, 10]),
+    }))
+
+    assert_pixels(document, '''
+        __________
+        __________
+        __KKKKK___
+        __KKKKK___
+        __KKKKK___
+        __KKKKK___
+        __KKKKK___
+        __KKKKK___
+        __________
+        __________
+    ''')
+
+
+def test_compress():
+    document = pydyf.PDF()
+
+    draw = pydyf.Stream()
+    draw.rectangle(2, 2, 5, 6)
+    draw.fill()
+    assert b'2 2 5 6' in draw.data
+
+    draw = pydyf.Stream(compress=True)
+    draw.rectangle(2, 2, 5, 6)
+    draw.fill()
+    assert b'2 2 5 6' not in draw.data
+    document.add_object(draw)
+
+    document.add_page(pydyf.Dictionary({
+        'Type': '/Page',
+        'Parent': document.pages.reference,
+        'Contents': draw.reference,
+        'MediaBox': pydyf.Array([0, 0, 10, 10]),
+    }))
+
+    assert_pixels(document, '''
+        __________
+        __________
+        __KKKKK___
+        __KKKKK___
+        __KKKKK___
+        __KKKKK___
+        __KKKKK___
+        __KKKKK___
+        __________
+        __________
+    ''')
