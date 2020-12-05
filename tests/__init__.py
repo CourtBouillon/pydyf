@@ -1,5 +1,9 @@
 """
 Test suite for pydyf
+
+This module adds a PNG export based on GhostScript. As GhostScript is released
+under AGPL, the whole testing suite is released under AGPL.
+
 """
 
 import io
