@@ -591,3 +591,50 @@ def test_compress():
         __________
         __________
     ''')
+
+
+def test_text():
+    document = pydyf.PDF()
+
+    font = pydyf.Dictionary({
+        'Type': '/Font',
+        'Subtype': '/Type1',
+        'Name': '/F1',
+        'BaseFont': '/Helvetica',
+        'Encoding': '/MacRomanEncoding',
+    })
+    document.add_object(font)
+
+    draw = pydyf.Stream()
+    draw.begin_text()
+    draw.set_font_size('F1', 200)
+    draw.text_matrix(1, 0, 0, 1, -20, 5)
+    draw.show_text(pydyf.String('l'))
+    draw.show_text(pydyf.String('É'))
+    draw.end_text()
+
+    document.add_object(draw)
+
+    document.add_page(pydyf.Dictionary({
+        'Type': '/Page',
+        'Parent': document.pages.reference,
+        'Contents': draw.reference,
+        'MediaBox': pydyf.Array([0, 0, 10, 10]),
+        'Resources': pydyf.Dictionary({
+            'ProcSet': pydyf.Array(['/PDF', '/Text']),
+            'Font': pydyf.Dictionary({'F1': font.reference}),
+        }),
+    }))
+
+    assert_pixels(document, '''
+        KKKKKKKKKK
+        KKKKKKKKKK
+        KKKKKKKKKK
+        KKKKKKKKKK
+        KKKKKKKKKK
+        __________
+        __________
+        __________
+        __________
+        __________
+    ''')
