@@ -1,2 +1,4 @@
 /docs/_build
+/tests/results
 __pycache__
+.coverage
