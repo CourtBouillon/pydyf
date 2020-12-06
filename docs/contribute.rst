@@ -30,7 +30,7 @@ Code & Issues
 If you’ve found a bug in pydyf, it’s time to report it, and to fix it if you
 can!
 
-You can report bugs and feature requests on `GitHub`_. If you want to add or
+You can report bugs and feature requests on GitHub_. If you want to add or
 fix some code, please fork the repository and create a pull request, we’ll be
 happy to review your work.
 
@@ -41,27 +41,30 @@ Tests
 -----
 
 Tests are stored in the ``tests`` folder at the top of the repository. They use
-the `pytest`_ library.
+the pytest_ library.
+
+Launching tests require to have Ghostscript_ installed and available in
+``PATH``.
 
 You can launch tests (with code coverage and lint) using the following command::
 
-  venv/bin/python -m pytest --flake8 --isort --cov=pydyf --cov=tests
+  venv/bin/pytest
 
 .. _pytest: https://docs.pytest.org/
+.. _Ghostscript: https://www.ghostscript.com/
 
 
 Documentation
 -------------
 
 Documentation is stored in the ``docs`` folder at the top of the repository. It
-relies on the `Sphinx`_ library.
+relies on the Sphinx_ library.
 
 You can build the documentation using the following command::
 
   venv/bin/sphinx-build docs docs/_build
 
-The documentation home page can now be found in the
-``/path/to/pydyf/docs/_build/index.html`` file. You can open this file in a
-browser to see the final rendering.
+The documentation home page can now be found in the ``docs/_build/index.html``
+file. You can open this file in a browser to see the final rendering.
 
 .. _Sphinx: https://www.sphinx-doc.org/
