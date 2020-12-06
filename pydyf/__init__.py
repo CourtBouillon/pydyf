@@ -1,5 +1,5 @@
 """
-pydyf − Low-level PDF generator
+A low-level PDF generator
 
 """
 
