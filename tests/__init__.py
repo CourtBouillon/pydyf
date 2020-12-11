@@ -29,10 +29,9 @@ def assert_pixels(document, reference_pixels):
     # Transform the PDF document into a list of RGB tuples
     pdf = io.BytesIO()
     document.write(pdf)
-    stderr = '%%stderr' if os.name == 'nt' else '%stderr'
     command = [
-        'gs', '-q', f'-sstdout={stderr}', '-dNOPAUSE', '-sDEVICE=png16m',
-        '-dSAFER', '-r576', '-dDownScaleFactor=8', '-sOutputFile=-', '-']
+        'gs', '-q', '-dNOPAUSE', '-dSAFER', '-sDEVICE=png16m',
+        '-r576', '-dDownScaleFactor=8', '-sOutputFile=-', '-']
     png = run(command, input=pdf.getvalue(), stdout=PIPE).stdout
     image = Image.open(io.BytesIO(png))
     pixels = image.getdata()
