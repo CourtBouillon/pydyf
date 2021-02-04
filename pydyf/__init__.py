@@ -320,7 +320,7 @@ class Stream(Object):
             compressobj = zlib.compressobj()
             stream = compressobj.compress(stream)
             stream += compressobj.flush()
-        extra['Length'] = len(stream) + 1
+        extra['Length'] = len(stream)
         return b'\n'.join((extra.data, b'stream', stream, b'endstream'))
 
 
