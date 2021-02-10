@@ -249,9 +249,17 @@ class Stream(Object):
         """Set line cap style."""
         self.stream.append(_to_bytes(line_cap) + b' J')
 
+    def set_line_join(self, line_join):
+        """Set line join style."""
+        self.stream.append(_to_bytes(line_join) + b' j')
+
     def set_line_width(self, width):
         """Set line width."""
         self.stream.append(_to_bytes(width) + b' w')
+
+    def set_miter_limit(self, miter_limit):
+        """Set miter limit."""
+        self.stream.append(_to_bytes(miter_limit) + b' M')
 
     def set_state(self, state_name):
         """Set specified parameters in graphic state.
