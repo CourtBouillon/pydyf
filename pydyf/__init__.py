@@ -245,6 +245,10 @@ class Stream(Object):
         self.stream.append(
             b'/' + _to_bytes(font) + b' ' + _to_bytes(size) + b' Tf')
 
+    def set_line_cap(self, line_cap):
+        """Set line cap style."""
+        self.stream.append(_to_bytes(line_cap) + b' J')
+
     def set_line_width(self, width):
         """Set line width."""
         self.stream.append(_to_bytes(width) + b' w')
