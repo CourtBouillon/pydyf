@@ -434,6 +434,7 @@ class PDF:
     def write_header(self, output):
         """Write PDF header to output."""
         self.write_line(b'%PDF-1.7', output)
+        self.write_line(b'%\xf0\x9f\x96\xa4', output)
 
     def write_body(self, output):
         """Write all non-free PDF objects to output."""
