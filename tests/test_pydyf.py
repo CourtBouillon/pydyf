@@ -217,6 +217,68 @@ def test_curve_to():
     ''')
 
 
+def test_curve_start_to():
+    document = pydyf.PDF()
+
+    draw = pydyf.Stream()
+    draw.move_to(2, 5)
+    draw.set_line_width(2)
+    draw.curve_start_to(3, 5, 5, 5)
+    draw.stroke()
+    document.add_object(draw)
+
+    document.add_page(pydyf.Dictionary({
+        'Type': '/Page',
+        'Parent': document.pages.reference,
+        'Contents': draw.reference,
+        'MediaBox': pydyf.Array([0, 0, 10, 10]),
+    }))
+
+    assert_pixels(document, '''
+        __________
+        __________
+        __________
+        __________
+        __KKK_____
+        __KKK_____
+        __________
+        __________
+        __________
+        __________
+    ''')
+
+
+def test_curve_end_to():
+    document = pydyf.PDF()
+
+    draw = pydyf.Stream()
+    draw.move_to(2, 5)
+    draw.set_line_width(2)
+    draw.curve_end_to(3, 5, 5, 5)
+    draw.stroke()
+    document.add_object(draw)
+
+    document.add_page(pydyf.Dictionary({
+        'Type': '/Page',
+        'Parent': document.pages.reference,
+        'Contents': draw.reference,
+        'MediaBox': pydyf.Array([0, 0, 10, 10]),
+    }))
+
+    assert_pixels(document, '''
+        __________
+        __________
+        __________
+        __________
+        __KKK_____
+        __KKK_____
+        __________
+        __________
+        __________
+        __________
+    ''')
+
+
 def test_transform():
     document = pydyf.PDF()
 

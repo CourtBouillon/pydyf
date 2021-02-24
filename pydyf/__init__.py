@@ -141,6 +141,26 @@ class Stream(Object):
             _to_bytes(x2), _to_bytes(y2),
             _to_bytes(x3), _to_bytes(y3), b'c')))
 
+    def curve_start_to(self, x2, y2, x3, y3):
+        """Add cubic Bézier curve to current path
+
+        The curve shall extend to ``(x3, y3)`` using the current point and
+        ``(x2, y2)`` as the Bézier control points.
+        """
+        self.stream.append(b' '.join((
+            _to_bytes(x2), _to_bytes(y2),
+            _to_bytes(x3), _to_bytes(y3), b'v')))
+
+    def curve_end_to(self, x1, y1, x3, y3):
+        """Add cubic Bézier curve to current path
+
+        The curve shall extend to ``(x3, y3)`` using `(x1, y1)`` and ``(x3,
+        y3)`` as the Bézier control points.
+        """
+        self.stream.append(b' '.join((
+            _to_bytes(x1), _to_bytes(y1),
+            _to_bytes(x3), _to_bytes(y3), b'y')))
+
     def draw_x_object(self, reference):
         """Draw object given by reference."""
         self.stream.append(b'/' + _to_bytes(reference) + b' Do')
