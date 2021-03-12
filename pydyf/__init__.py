@@ -146,6 +146,7 @@ class Stream(Object):
 
         The curve shall extend to ``(x3, y3)`` using the current point and
         ``(x2, y2)`` as the Bézier control points.
+
         """
         self.stream.append(b' '.join((
             _to_bytes(x2), _to_bytes(y2),
@@ -156,6 +157,7 @@ class Stream(Object):
 
         The curve shall extend to ``(x3, y3)`` using `(x1, y1)`` and ``(x3,
         y3)`` as the Bézier control points.
+
         """
         self.stream.append(b' '.join((
             _to_bytes(x1), _to_bytes(y1),
