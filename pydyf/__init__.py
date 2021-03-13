@@ -1,5 +1,5 @@
 """
-A low-level PDF generator
+A low-level PDF generator.
 
 """
 
@@ -7,7 +7,7 @@ import sys
 import zlib
 from codecs import BOM_UTF16_BE
 
-VERSION = __version__ = '0.0.1'
+VERSION = __version__ = '0.0.2'
 
 
 def _to_bytes(item):
