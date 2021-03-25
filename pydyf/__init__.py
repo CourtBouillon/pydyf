@@ -17,7 +17,7 @@ def _to_bytes(item):
     elif isinstance(item, Object):
         return item.data
     elif isinstance(item, float):
-        if item.as_integer_ratio()[1] == 1:
+        if item.is_integer():
             return f'{int(item):d}'.encode('ascii')
         else:
             return f'{item:f}'.encode('ascii')
