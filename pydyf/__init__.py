@@ -7,7 +7,7 @@ import sys
 import zlib
 from codecs import BOM_UTF16_BE
 
-VERSION = __version__ = '0.0.2'
+VERSION = __version__ = '0.0.3'
 
 
 def _to_bytes(item):

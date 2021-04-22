@@ -2,6 +2,36 @@ Changelog
 =========
 
 
+Version 0.0.3
+-------------
+
+Released on 2021-04-22.
+
+New features:
+
+* Support text rendering
+
+Contributors:
+
+* Guillaume Ayoub
+
+Backers and sponsors:
+
+* PDF Blocks
+* SimonSoft
+* Menutech
+* Simon Sapin
+* Manuel Barkhau
+* Andreas Zettl
+* Nathalie Gutton
+* Tom Pohl
+* René Fritz
+* Moritz Mahringer
+* Florian Demmer
+* KontextWork
+* Michele Mostarda
+
+
 Version 0.0.2
 -------------
 
