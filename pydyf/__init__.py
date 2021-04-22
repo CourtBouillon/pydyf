@@ -267,6 +267,10 @@ class Stream(Object):
         self.stream.append(
             b'/' + _to_bytes(font) + b' ' + _to_bytes(size) + b' Tf')
 
+    def set_text_rendering(self, mode):
+        """Set text rendering mode."""
+        self.stream.append(_to_bytes(mode) + b' Tr')
+
     def set_line_cap(self, line_cap):
         """Set line cap style."""
         self.stream.append(_to_bytes(line_cap) + b' J')
