@@ -1,8 +1,12 @@
 """
 Test suite for pydyf.
 
-This module adds a PNG export based on GhostScript. As GhostScript is released
-under AGPL, the whole testing suite is released under AGPL.
+This module adds a PNG export based on GhostScript, that is released under
+AGPL. As "the end user has the ability to opt out of installing the AGPL
+version of [Ghostscript] during the install process", and with explicit
+aggreement from Artifex, it is OK to distribute this code under BSD.
+
+See https://www.ghostscript.com/license.html.
 
 """
 
