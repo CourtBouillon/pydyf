@@ -3,7 +3,6 @@ A low-level PDF generator.
 
 """
 
-import sys
 import zlib
 from codecs import BOM_UTF16_BE
 
@@ -458,17 +457,17 @@ class PDF:
         :param content: Content to write.
         :type content: :obj:`bytes`
         :param output: Output stream.
-        :type output: :term:`file object`
+        :type output: binary :term:`file object`
 
         """
         self.current_position += len(content) + 1
         output.write(content + b'\n')
 
-    def write(self, output=sys.stdout.buffer):
+    def write(self, output):
         """Write PDF to output.
 
-        :param output: Output stream, :obj:`sys.stdout` by default.
-        :type output: :term:`file object`
+        :param output: Output stream.
+        :type output: binary :term:`file object`
 
         """
         # Write header
