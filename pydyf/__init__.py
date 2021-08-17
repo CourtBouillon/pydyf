@@ -18,12 +18,12 @@ def _to_bytes(item):
         return item.data
     elif isinstance(item, float):
         if item.is_integer():
-            return f'{int(item):d}'.encode('ascii')
+            return f'{int(item):d}'.encode()
         else:
-            return f'{item:f}'.encode('ascii')
+            return f'{item:f}'.encode()
     elif isinstance(item, int):
-        return f'{item:d}'.encode('ascii')
-    return str(item).encode('ascii')
+        return f'{item:d}'.encode()
+    return str(item).encode()
 
 
 class Object:
@@ -43,8 +43,8 @@ class Object:
     def indirect(self):
         """Indirect representation of an object."""
         return b'\n'.join((
-            str(self.number).encode('ascii') + b' ' +
-            str(self.generation).encode('ascii') + b' obj',
+            str(self.number).encode() + b' ' +
+            str(self.generation).encode() + b' obj',
             self.data,
             b'endobj',
         ))
@@ -53,8 +53,8 @@ class Object:
     def reference(self):
         """Object identifier."""
         return (
-            str(self.number).encode('ascii') + b' ' +
-            str(self.generation).encode('ascii') + b' R')
+            str(self.number).encode() + b' ' +
+            str(self.generation).encode() + b' R')
 
     @property
     def data(self):
@@ -379,7 +379,7 @@ class String(Object):
             return b'(' + _to_bytes(self.string) + b')'
         except UnicodeEncodeError:
             encoded = BOM_UTF16_BE + str(self.string).encode('utf-16-be')
-            return b'<' + encoded.hex().encode('ascii') + b'>'
+            return b'<' + encoded.hex().encode() + b'>'
 
 
 class Array(Object, list):
@@ -486,12 +486,11 @@ class PDF:
         """Write cross reference table to output."""
         self.xref_position = self.current_position
         self.write_line(b'xref', output)
-        self.write_line(f'0 {len(self.objects)}'.encode('ascii'), output)
+        self.write_line(f'0 {len(self.objects)}'.encode(), output)
         for object_ in self.objects:
             self.write_line(
                 (f'{object_.offset:010} {object_.generation:05} '
-                 f'{object_.free} ').encode('ascii'), output
-            )
+                 f'{object_.free} ').encode(), output)
 
     def write_trailer(self, output):
         """Write trailer to output."""
@@ -502,7 +501,7 @@ class PDF:
             'Info': self.info.reference,
         }), output)
         self.write_line(b'startxref', output)
-        self.write_line(str(self.xref_position).encode('ascii'), output)
+        self.write_line(str(self.xref_position).encode(), output)
         self.write_line(b'%%EOF', output)
 
     def write(self, output=sys.stdout.buffer):
