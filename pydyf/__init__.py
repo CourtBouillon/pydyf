@@ -464,26 +464,25 @@ class PDF:
         self.current_position += len(content) + 1
         output.write(content + b'\n')
 
-    def write_object(self, object_, output):
-        """Write object to output."""
-        for line in object_.data.split(b'\n'):
-            self.write_line(line, output)
+    def write(self, output=sys.stdout.buffer):
+        """Write PDF to output.
 
-    def write_header(self, output):
-        """Write PDF header to output."""
+        :param output: Output stream, :obj:`sys.stdout` by default.
+        :type output: :term:`file object`
+
+        """
+        # Write header
         self.write_line(b'%PDF-1.7', output)
         self.write_line(b'%\xf0\x9f\x96\xa4', output)
 
-    def write_body(self, output):
-        """Write all non-free PDF objects to output."""
+        # Write all non-free PDF objects
         for object_ in self.objects:
             if object_.free == 'f':
                 continue
             object_.offset = self.current_position
             self.write_line(object_.indirect, output)
 
-    def write_cross_reference_table(self, output):
-        """Write cross reference table to output."""
+        # Write cross reference table
         self.xref_position = self.current_position
         self.write_line(b'xref', output)
         self.write_line(f'0 {len(self.objects)}'.encode(), output)
@@ -492,26 +491,13 @@ class PDF:
                 (f'{object_.offset:010} {object_.generation:05} '
                  f'{object_.free} ').encode(), output)
 
-    def write_trailer(self, output):
-        """Write trailer to output."""
+        # Write trailer
         self.write_line(b'trailer', output)
-        self.write_object(Dictionary({
-            'Size': len(self.objects),
-            'Root': self.catalog.reference,
-            'Info': self.info.reference,
-        }), output)
+        self.write_line(b'<<', output)
+        self.write_line(f'/Size {len(self.objects)}'.encode(), output)
+        self.write_line(b'/Root ' + self.catalog.reference, output)
+        self.write_line(b'/Info ' + self.info.reference, output)
+        self.write_line(b'>>', output)
         self.write_line(b'startxref', output)
-        self.write_line(str(self.xref_position).encode(), output)
+        self.write_line(f'{self.xref_position}'.encode(), output)
         self.write_line(b'%%EOF', output)
-
-    def write(self, output=sys.stdout.buffer):
-        """Write PDF to output.
-
-        :param output: Output stream, :obj:`sys.stdout` by default.
-        :type output: :term:`file object`
-
-        """
-        self.write_header(output)
-        self.write_body(output)
-        self.write_cross_reference_table(output)
-        self.write_trailer(output)
