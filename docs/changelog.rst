@@ -2,6 +2,41 @@ Changelog
 =========
 
 
+Version 0.1.0
+-------------
+
+Released on 2021-08-21.
+
+Bug fixes:
+
+* `#8 <https://github.com/CourtBouillon/pydyf/issues/8>`_:
+  Don’t use sys.stdout.buffer as default write object
+
+Contributors:
+
+* Guillaume Ayoub
+
+Backers and sponsors:
+
+* Grip Angebotssoftware
+* PDF Blocks
+* SimonSoft
+* Menutech
+* Manuel Barkhau
+* Simon Sapin
+* KontextWork
+* René Fritz
+* Maykin Media
+* NCC Group
+* Des images et des mots
+* Andreas Zettl
+* Nathalie Gutton
+* Tom Pohl
+* Moritz Mahringer
+* Florian Demmer
+* Yanal-Yvez Fargialla
+
+
 Version 0.0.3
 -------------
 
