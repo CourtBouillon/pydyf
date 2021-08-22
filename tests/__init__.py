@@ -65,7 +65,7 @@ def assert_pixels(document, reference_pixels):
                 reference_pixels = [
                     pixel or (255, 255, 255) for pixel in reference_pixels]
                 write_png(f'{name}-reference', reference_pixels, width, height)
-                x, y = i // width, i % width
+                x, y = i % width, i // width
                 assert 0, (
                     f'Pixel ({x}, {y}) in {name}: '
                     f'reference rgba{reference}, got rgba{value}')
