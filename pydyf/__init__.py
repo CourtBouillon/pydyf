@@ -6,7 +6,7 @@ A low-level PDF generator.
 import zlib
 from codecs import BOM_UTF16_BE
 
-VERSION = __version__ = '0.1.0'
+VERSION = __version__ = '0.1.1'
 
 
 def _to_bytes(item):

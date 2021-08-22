@@ -2,6 +2,41 @@ Changelog
 =========
 
 
+Version 0.1.1
+-------------
+
+Released on 2021-08-22.
+
+Bug fixes:
+
+* `0f7c8e9 <https://github.com/CourtBouillon/pydyf/commit/0f7c8e9>`_:
+  Fix string encoding
+
+Contributors:
+
+* Guillaume Ayoub
+
+Backers and sponsors:
+
+* Grip Angebotssoftware
+* PDF Blocks
+* SimonSoft
+* Menutech
+* Manuel Barkhau
+* Simon Sapin
+* KontextWork
+* René Fritz
+* Maykin Media
+* NCC Group
+* Des images et des mots
+* Andreas Zettl
+* Nathalie Gutton
+* Tom Pohl
+* Moritz Mahringer
+* Florian Demmer
+* Yanal-Yvez Fargialla
+
+
 Version 0.1.0
 -------------
 
