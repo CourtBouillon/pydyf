@@ -700,3 +700,9 @@ def test_text():
         __________
         __________
     ''')
+
+
+def test_string_encoding():
+    assert pydyf.String('abc').data == b'(abc)'
+    assert pydyf.String('déf').data == b'<feff006400e90066>'
+    assert pydyf.String('♡').data == b'<feff2661>'

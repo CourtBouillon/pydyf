@@ -17,12 +17,12 @@ def _to_bytes(item):
         return item.data
     elif isinstance(item, float):
         if item.is_integer():
-            return f'{int(item):d}'.encode()
+            return f'{int(item):d}'.encode('ascii')
         else:
-            return f'{item:f}'.encode()
+            return f'{item:f}'.encode('ascii')
     elif isinstance(item, int):
-        return f'{item:d}'.encode()
-    return str(item).encode()
+        return f'{item:d}'.encode('ascii')
+    return str(item).encode('ascii')
 
 
 class Object:
