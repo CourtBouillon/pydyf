@@ -375,7 +375,13 @@ class String(Object):
     @property
     def data(self):
         try:
-            return b'(' + _to_bytes(self.string) + b')'
+            # "A literal string is written as an arbitrary number of characters
+            # enclosed in parentheses. Any characters may appear in a string
+            # except unbalanced parentheses and the backslash, which must be
+            # treated specially."
+            escaped = _to_bytes(self.string).replace(
+                b'\\', b'\\\\').replace(b'(', b'\\(').replace(b')', b'\\)')
+            return b'(' + escaped + b')'
         except UnicodeEncodeError:
             encoded = BOM_UTF16_BE + str(self.string).encode('utf-16-be')
             return b'<' + encoded.hex().encode() + b'>'

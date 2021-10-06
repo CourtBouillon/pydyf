@@ -706,3 +706,6 @@ def test_string_encoding():
     assert pydyf.String('abc').data == b'(abc)'
     assert pydyf.String('déf').data == b'<feff006400e90066>'
     assert pydyf.String('♡').data == b'<feff2661>'
+    assert pydyf.String('\\abc').data == b'(\\\\abc)'
+    assert pydyf.String('abc(').data == b'(abc\\()'
+    assert pydyf.String('ab)c').data == b'(ab\\)c)'
