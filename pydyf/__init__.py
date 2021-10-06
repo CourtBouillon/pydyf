@@ -3,6 +3,7 @@ A low-level PDF generator.
 
 """
 
+import re
 import zlib
 from codecs import BOM_UTF16_BE
 
@@ -379,8 +380,7 @@ class String(Object):
             # enclosed in parentheses. Any characters may appear in a string
             # except unbalanced parentheses and the backslash, which must be
             # treated specially."
-            escaped = _to_bytes(self.string).replace(
-                b'\\', b'\\\\').replace(b'(', b'\\(').replace(b')', b'\\)')
+            escaped = re.sub(rb'([\\\(\)])', rb'\\\1', _to_bytes(self.string))
             return b'(' + escaped + b')'
         except UnicodeEncodeError:
             encoded = BOM_UTF16_BE + str(self.string).encode('utf-16-be')
