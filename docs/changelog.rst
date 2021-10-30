@@ -2,6 +2,44 @@ Changelog
 =========
 
 
+Version 0.1.2
+-------------
+
+Released on 2021-10-30.
+
+Bug fixes:
+
+* `#9 <https://github.com/CourtBouillon/pydyf/pull/9>`_:
+  Implement escaping for Strings
+
+Contributors:
+
+* Guillaume Ayoub
+* Rian McGuire
+
+Backers and sponsors:
+
+* Grip Angebotssoftware
+* SimonSoft
+* Menutech
+* Manuel Barkhau
+* Simon Sapin
+* KontextWork
+* René Fritz
+* Maykin Media
+* NCC Group
+* Crisp BV
+* Des images et des mots
+* Andreas Zettl
+* Nathalie Gutton
+* Tom Pohl
+* Moritz Mahringer
+* Florian Demmer
+* Yanal-Yvez Fargialla
+* G. Allard
+* Gábor
+
+
 Version 0.1.1
 -------------
 
