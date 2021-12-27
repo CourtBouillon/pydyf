@@ -1,12 +1,6 @@
 # pydyf documentation build configuration file.
 
-import sys
-from pathlib import Path
-
 import pydyf
-
-# Add current path for css_diagram_role
-sys.path.append(str(Path(__file__).parent))
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
