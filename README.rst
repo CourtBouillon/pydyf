@@ -2,7 +2,7 @@ pydyf is a low-level PDF generator written in Python and based on PDF
 specification 1.7.
 
 * Free software: BSD license
-* For Python 3.6+, tested on CPython and PyPy
+* For Python 3.7+, tested on CPython and PyPy
 * Documentation: https://doc.courtbouillon.org/pydyf
 * Changelog: https://github.com/CourtBouillon/pydyf/releases
 * Code, issues, tests: https://github.com/CourtBouillon/pydyf
