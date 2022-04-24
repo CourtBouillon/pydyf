@@ -283,10 +283,10 @@ def test_transform():
     document = pydyf.PDF()
 
     draw = pydyf.Stream()
+    draw.transform(1, 0, 0, 1, 1, 1)
     draw.move_to(2, 2)
     draw.set_line_width(2)
     draw.line_to(2, 5)
-    draw.transform(1, 0, 0, 1, 1, 1)
     draw.stroke()
     document.add_object(draw)
 
@@ -694,7 +694,7 @@ def test_text():
         KKKKKKKKKK
         KKKKKKKKKK
         KKKKKKKKKK
-        __________
+        zzzzzzzzzz
         __________
         __________
         __________
