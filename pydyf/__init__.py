@@ -469,15 +469,16 @@ class PDF:
         self.current_position += len(content) + 1
         output.write(content + b'\n')
 
-    def write(self, output):
+    def write(self, output, version=b'1.7'):
         """Write PDF to output.
 
         :param output: Output stream.
         :type output: binary :term:`file object`
+        :param bytes version: PDF version, default is 1.7.
 
         """
         # Write header
-        self.write_line(b'%PDF-1.7', output)
+        self.write_line(b'%PDF-' + version, output)
         self.write_line(b'%\xf0\x9f\x96\xa4', output)
 
         # Write all non-free PDF objects
