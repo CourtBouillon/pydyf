@@ -6,6 +6,7 @@ A low-level PDF generator.
 import re
 import zlib
 from codecs import BOM_UTF16_BE
+from hashlib import md5
 
 VERSION = __version__ = '0.1.2'
 
@@ -469,12 +470,13 @@ class PDF:
         self.current_position += len(content) + 1
         output.write(content + b'\n')
 
-    def write(self, output, version=b'1.7'):
+    def write(self, output, version=b'1.7', identifier=None):
         """Write PDF to output.
 
         :param output: Output stream.
         :type output: binary :term:`file object`
         :param bytes version: PDF version, default is 1.7.
+        :param bytes identifier: PDF file identifier.
 
         """
         # Write header
@@ -503,6 +505,13 @@ class PDF:
         self.write_line(f'/Size {len(self.objects)}'.encode(), output)
         self.write_line(b'/Root ' + self.catalog.reference, output)
         self.write_line(b'/Info ' + self.info.reference, output)
+        if identifier is not None:
+            data = b''.join(
+                obj.data for obj in self.objects if obj.free != 'f')
+            data_hash = md5(data).hexdigest().encode()
+            self.write_line(
+                b'/ID [' + String(identifier).data + b' ' +
+                String(data_hash).data + b']', output)
         self.write_line(b'>>', output)
         self.write_line(b'startxref', output)
         self.write_line(f'{self.xref_position}'.encode(), output)
