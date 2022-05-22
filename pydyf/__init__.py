@@ -426,7 +426,7 @@ class PDF:
         })
         self.add_object(self.pages)
 
-        #: PDF :class:`Dictionary` containing the PDF’s metadata.
+        #: PDF :class:`Dictionary` containing the PDF’s metadata.
         self.info = Dictionary({})
         self.add_object(self.info)
 
