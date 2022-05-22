@@ -1,3 +1,5 @@
+import io
+
 import pydyf
 
 from . import assert_pixels
@@ -700,6 +702,20 @@ def test_text():
         __________
         __________
     ''')
+
+
+def test_identifier():
+    document = pydyf.PDF()
+    pdf = io.BytesIO()
+    document.write(pdf, identifier=b'abc')
+    assert b'abc' in pdf.getvalue()
+
+
+def test_version():
+    document = pydyf.PDF()
+    pdf = io.BytesIO()
+    document.write(pdf, version=b'2.0')
+    assert b'2.0' in pdf.getvalue()
 
 
 def test_string_encoding():
