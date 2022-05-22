@@ -38,13 +38,13 @@ Donation = 'https://opencollective.com/courtbouillon'
 
 [project.optional-dependencies]
 doc = ['sphinx', 'sphinx_rtd_theme']
-test = ['pytest', 'pytest-cov', 'pytest-flake8', 'pytest-isort', 'coverage[toml]', 'pillow']
+test = ['pytest', 'pytest-xdist', 'pytest-flake8', 'pytest-isort', 'pytest-cov', 'coverage[toml]', 'pillow']
 
 [tool.flit.sdist]
 exclude = ['.*']
 
 [tool.pytest.ini_options]
-addopts = '--isort --flake8 --cov --no-cov-on-fail'
+addopts = '--isort --flake8 --numprocesses=auto'
 
 [tool.coverage.run]
 branch = true
