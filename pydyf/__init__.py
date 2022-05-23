@@ -8,7 +8,7 @@ import zlib
 from codecs import BOM_UTF16_BE
 from hashlib import md5
 
-VERSION = __version__ = '0.1.2'
+VERSION = __version__ = '0.2.0'
 
 
 def _to_bytes(item):
@@ -475,7 +475,7 @@ class PDF:
 
         :param output: Output stream.
         :type output: binary :term:`file object`
-        :param bytes version: PDF version, default is 1.7.
+        :param bytes version: PDF version.
         :param bytes identifier: PDF file identifier.
 
         """

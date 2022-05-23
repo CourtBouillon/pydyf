@@ -2,6 +2,49 @@ Changelog
 =========
 
 
+Version 0.2.0
+-------------
+
+Released on 2022-05-23.
+
+Dependencies:
+
+* Python 3.7+ is now needed, Python 3.6 is not supported anymore
+
+  New features:
+
+* `d0be36b <https://github.com/CourtBouillon/pydyf/commit/d0be36b>`_:
+  Allow to set PDF version
+* `879261c <https://github.com/CourtBouillon/pydyf/commit/879261c>`_:
+  Allow to set PDF identifier
+
+Contributors:
+
+* Guillaume Ayoub
+
+Backers and sponsors:
+
+* Grip Angebotssoftware
+* Manuel Barkhau
+* Crisp BV
+* SimonSoft
+* Menutech
+* Spacinov
+* KontextWork
+* René Fritz
+* Kobalt
+* NCC Group
+* Des images et des mots
+* Nathalie Gutton
+* Andreas Zettl
+* Tom Pohl
+* Moritz Mahringer
+* Florian Demmer
+* Yanal-Yvez Fargialla
+* Gábor
+* Piotr Horzycki
+
+
 Version 0.1.2
 -------------
 
