@@ -97,6 +97,15 @@ class Stream(Object):
         #: Compress the stream data if set to ``True``. Default is ``False``.
         self.compress = compress
 
+    def begin_marked_content(self, tag, property_list=None):
+        """Begin marked-content sequence."""
+        self.stream.append(f'/{tag}')
+        if property_list is None:
+            self.stream.append(b'BMC')
+        else:
+            self.stream.append(property_list)
+            self.stream.append(b'BDC')
+
     def begin_text(self):
         """Begin a text object."""
         self.stream.append(b'BT')
@@ -171,6 +180,10 @@ class Stream(Object):
     def end(self):
         """End path without filling or stroking."""
         self.stream.append(b'n')
+
+    def end_marked_content(self):
+        """End marked-content sequence."""
+        self.stream.append(b'EMC')
 
     def end_text(self):
         """End text object."""
