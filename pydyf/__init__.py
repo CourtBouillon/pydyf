@@ -422,7 +422,18 @@ class Array(Object, list):
 
 class PDF:
     """PDF document."""
-    def __init__(self):
+    def __init__(self, version=b'1.7', identifier=None):
+        """Create a PDF document.
+
+        :param bytes version: PDF version.
+        :param bytes identifier: PDF file identifier.
+
+        """
+        #: PDF version, as :obj:`bytes`.
+        self.version = _to_bytes(version)
+        #: PDF file identifier.
+        self.identifier = identifier
+
         #: Python :obj:`list` containing the PDF’s objects.
         self.objects = []
 
@@ -483,7 +494,7 @@ class PDF:
         self.current_position += len(content) + 1
         output.write(content + b'\n')
 
-    def write(self, output, version=b'1.7', identifier=None):
+    def write(self, output, version=None, identifier=None):
         """Write PDF to output.
 
         :param output: Output stream.
@@ -492,6 +503,9 @@ class PDF:
         :param bytes identifier: PDF file identifier.
 
         """
+        version = self.version if version is None else _to_bytes(version)
+        identifier = self.identifier if identifier is None else identifier
+
         # Write header
         self.write_line(b'%PDF-' + version, output)
         self.write_line(b'%\xf0\x9f\x96\xa4', output)
