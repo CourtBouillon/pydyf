@@ -46,12 +46,20 @@ the pytest_ library.
 Launching tests require to have Ghostscript_ installed and available in
 ``PATH``.
 
-You can launch tests (with code coverage and lint) using the following command::
+You can launch tests using the following command::
 
   venv/bin/pytest
 
+WeasyPrint also uses isort_ to check imports and flake8_ to check the coding
+style::
+
+  venv/bin/python -m isort . --check --diff
+  venv/bin/python -m flake8
+
 .. _pytest: https://docs.pytest.org/
 .. _Ghostscript: https://www.ghostscript.com/
+.. _isort: https://pycqa.github.io/isort/
+.. _flake8: https://flake8.pycqa.org/
 
 
 Documentation
