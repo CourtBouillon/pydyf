@@ -38,7 +38,7 @@ Donation = 'https://opencollective.com/courtbouillon'
 
 [project.optional-dependencies]
 doc = ['sphinx', 'sphinx_rtd_theme']
-test = ['pytest', 'isort', 'flake8']
+test = ['pytest', 'isort', 'flake8', 'pillow']
 
 [tool.flit.sdist]
 exclude = ['.*']
