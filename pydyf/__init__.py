@@ -8,7 +8,7 @@ import zlib
 from codecs import BOM_UTF16_BE
 from hashlib import md5
 
-VERSION = __version__ = '0.2.0'
+VERSION = __version__ = '0.3.0'
 
 
 def _to_bytes(item):

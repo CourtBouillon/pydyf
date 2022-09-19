@@ -2,6 +2,40 @@ Changelog
 =========
 
 
+Version 0.3.0
+-------------
+
+Released on 2022-09-19.
+
+New features:
+
+* Support marked content
+* Allow version and ID to be specified when initializing PDF objects
+
+Contributors:
+
+* Guillaume Ayoub
+
+Backers and sponsors:
+
+* Grip Angebotssoftware
+* Manuel Barkhau
+* Crisp BV
+* SimonSoft
+* Menutech
+* Spacinov
+* KontextWork
+* René Fritz
+* NCC Group
+* Kobalt
+* Tom Pohl
+* John R Ellis
+* Moritz Mahringer
+* Gábor
+* Piotr Horzycki
+* Andrew Ittner
+
+
 Version 0.2.0
 -------------
 
@@ -11,7 +45,7 @@ Dependencies:
 
 * Python 3.7+ is now needed, Python 3.6 is not supported anymore
 
-  New features:
+New features:
 
 * `d0be36b <https://github.com/CourtBouillon/pydyf/commit/d0be36b>`_:
   Allow to set PDF version
