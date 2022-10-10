@@ -475,7 +475,7 @@ class PDF:
         """
         self.pages['Count'] += 1
         self.add_object(page)
-        self.pages['Kids'].extend([page.number, 0, 'R'])
+        self.pages['Kids'].append(f'{page.number} 0 R'.encode('ascii'))
 
     def add_object(self, object_):
         """Add object to the PDF."""
