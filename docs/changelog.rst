@@ -10,7 +10,7 @@ Released on 2022-10-11.
 New features:
 
 * Add the PDF.page_references property
-* Revert the PDF.pages['Kids'] behavior to be retro-compatible with version 0.3.0
+* Revert the PDF.pages['Kids'] behavior to be backwards compatible with version 0.3.0
 
 Backers and sponsors:
 
