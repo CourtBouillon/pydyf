@@ -2,6 +2,36 @@ Changelog
 =========
 
 
+Version 0.4.0
+-------------
+
+Released on 2022-10-11.
+
+New features:
+
+* Allow nth page’s reference to be retrieved using PDF.pages['Kids'][n]
+
+Backers and sponsors:
+
+* Grip Angebotssoftware
+* Manuel Barkhau
+* Crisp BV
+* SimonSoft
+* Menutech
+* Spacinov
+* KontextWork
+* René Fritz
+* NCC Group
+* Kobalt
+* Tom Pohl
+* John R Ellis
+* Moritz Mahringer
+* Yanal-Yvez Fargialla
+* Gábor
+* Piotr Horzycki
+* Andrew Ittner
+
+
 Version 0.3.0
 -------------
 
