@@ -2,6 +2,37 @@ Changelog
 =========
 
 
+Version 0.5.0
+-------------
+
+Released on 2022-10-11.
+
+New features:
+
+* Add the PDF.page_references property
+* Revert the PDF.pages['Kids'] behavior to be retro-compatible with version 0.3.0
+
+Backers and sponsors:
+
+* Grip Angebotssoftware
+* Manuel Barkhau
+* Crisp BV
+* SimonSoft
+* Menutech
+* Spacinov
+* KontextWork
+* René Fritz
+* NCC Group
+* Kobalt
+* Tom Pohl
+* John R Ellis
+* Moritz Mahringer
+* Yanal-Yvez Fargialla
+* Gábor
+* Piotr Horzycki
+* Andrew Ittner
+
+
 Version 0.4.0
 -------------
 

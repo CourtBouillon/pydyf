@@ -8,7 +8,7 @@ import zlib
 from codecs import BOM_UTF16_BE
 from hashlib import md5
 
-VERSION = __version__ = '0.4.0'
+VERSION = __version__ = '0.5.0'
 
 
 def _to_bytes(item):
@@ -475,12 +475,18 @@ class PDF:
         """
         self.pages['Count'] += 1
         self.add_object(page)
-        self.pages['Kids'].append(f'{page.number} 0 R'.encode('ascii'))
+        self.pages['Kids'].extend([page.number, 0, 'R'])
 
     def add_object(self, object_):
         """Add object to the PDF."""
         object_.number = len(self.objects)
         self.objects.append(object_)
+
+    @property
+    def page_references(self):
+        return tuple(
+            f'{object_number} 0 R'.encode('ascii')
+            for object_number in self.pages['Kids'][::3])
 
     def write_line(self, content, output):
         """Write line to output.
