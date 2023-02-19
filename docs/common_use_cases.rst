@@ -97,7 +97,7 @@ Display image
 
    document = pydyf.PDF()
 
-   extra = Dictionary({
+   extra = pydyf.Dictionary({
        'Type': '/XObject',
        'Subtype': '/Image',
        'Width': 197,
