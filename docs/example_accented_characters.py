@@ -32,14 +32,6 @@ text.text_matrix(1, 0, 0, 1, 10, 160)
 text.show_text(pydyf.String('Argüição…  Łódź!'.encode('mac_roman', errors='replace')))  # Ł and ź are not available
 text.end_text()
 
-# Another line of text, this time colored
-text.begin_text()
-text.set_font_size('F1', 10)
-text.set_color_rgb(0.4, 0, 0.7)
-text.text_matrix(1, 0, 0, 1, 10, 140)
-text.show_text(pydyf.String('Saint-Andéol-le-Château. Freißenbüttel'.encode('mac_roman', errors='replace')))  # Ł and ź are not available
-text.end_text()
-
 document.add_object(text)
 
 # Put the font in the resources of the PDF
