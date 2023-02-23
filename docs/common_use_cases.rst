@@ -158,9 +158,9 @@ Display text
   # And display it
   text = pydyf.Stream()
   text.begin_text()
-  text.set_font_size('F1', 24)
+  text.set_font_size('F1', 20)
   text.text_matrix(1, 0, 0, 1, 10, 90)
-  text.show_text(pydyf.String('Hello World'))
+  text.show_text(pydyf.String('Bœuf grillé & café'.encode('macroman')))
   text.end_text()
 
   document.add_object(text)
@@ -179,4 +179,3 @@ Display text
 
   with open('document.pdf', 'wb') as f:
       document.write(f)
-
