@@ -43,19 +43,13 @@ class Object:
     @property
     def indirect(self):
         """Indirect representation of an object."""
-        return b'\n'.join((
-            str(self.number).encode() + b' ' +
-            str(self.generation).encode() + b' obj',
-            self.data,
-            b'endobj',
-        ))
+        header = f'{self.number} {self.generation} obj\n'.encode()
+        return header + self.data + b'\nendobj'
 
     @property
     def reference(self):
         """Object identifier."""
-        return (
-            str(self.number).encode() + b' ' +
-            str(self.generation).encode() + b' R')
+        return f'{self.number} {self.generation} R'.encode()
 
     @property
     def data(self):
