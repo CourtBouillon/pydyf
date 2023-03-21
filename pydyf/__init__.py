@@ -21,7 +21,7 @@ def _to_bytes(item):
         if item.is_integer():
             return f'{int(item):d}'.encode('ascii')
         else:
-            return f'{item:f}'.encode('ascii')
+            return f'{item:f}'.rstrip('0').encode('ascii')
     elif isinstance(item, int):
         return f'{item:d}'.encode('ascii')
     return str(item).encode('ascii')
