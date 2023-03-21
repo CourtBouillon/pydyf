@@ -65,11 +65,10 @@ class Dictionary(Object, dict):
 
     @property
     def data(self):
-        result = [b'<<']
-        for key, value in self.items():
-            result.append(b'/' + _to_bytes(key) + b' ' + _to_bytes(value))
-        result.append(b'>>')
-        return b'\n'.join(result)
+        result = [
+            b'/' + _to_bytes(key) + b' ' + _to_bytes(value)
+            for key, value in self.items()]
+        return b'<<' + b''.join(result) + b'>>'
 
 
 class Stream(Object):
@@ -399,11 +398,7 @@ class Array(Object, list):
 
     @property
     def data(self):
-        result = [b'[']
-        for child in self:
-            result.append(_to_bytes(child))
-        result.append(b']')
-        return b' '.join(result)
+        return b'[' + b' '.join(_to_bytes(child) for child in self) + b']'
 
 
 class PDF:
