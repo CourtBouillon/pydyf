@@ -64,11 +64,7 @@ class Object:
 
 
 class Dictionary(Object, dict):
-    """PDF Dictionary object.
-
-    Inherits from :class:`Object` and Python :obj:`dict`.
-
-    """
+    """PDF Dictionary object."""
     def __init__(self, values=None):
         Object.__init__(self)
         dict.__init__(self, values or {})
@@ -83,11 +79,7 @@ class Dictionary(Object, dict):
 
 
 class Stream(Object):
-    """PDF Stream object.
-
-    Inherits from :class:`Object`.
-
-    """
+    """PDF Stream object."""
     def __init__(self, stream=None, extra=None, compress=False):
         super().__init__()
         #: Python array of data composing stream.
@@ -385,11 +377,7 @@ class Stream(Object):
 
 
 class String(Object):
-    """PDF String object.
-
-    Inherits from :class:`Object`.
-
-    """
+    """PDF String object."""
     def __init__(self, string=''):
         super().__init__()
         #: Unicode string.
@@ -410,11 +398,7 @@ class String(Object):
 
 
 class Array(Object, list):
-    """PDF Array object.
-
-    Inherits from :class:`Object` and Python :obj:`list`.
-
-    """
+    """PDF Array object."""
     def __init__(self, array=None):
         Object.__init__(self)
         list.__init__(self, array or [])
