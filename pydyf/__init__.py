@@ -221,6 +221,10 @@ class Stream(Object):
         """Begin new subpath by moving current point to ``(x, y)``."""
         self.stream.append(b' '.join((_to_bytes(x), _to_bytes(y), b'm')))
 
+    def move_text_to(self, x, y):
+        """Move text to next line at ``(x, y)`` distance from previous line."""
+        self.stream.append(b' '.join((_to_bytes(x), _to_bytes(y), b'Td')))
+
     def shading(self, name):
         """Paint shape and color shading using shading dictionary ``name``."""
         self.stream.append(b'/' + _to_bytes(name) + b' sh')
@@ -310,8 +314,12 @@ class Stream(Object):
         self.stream.append(b'/' + _to_bytes(state_name) + b' gs')
 
     def show_text(self, text):
-        """Show text."""
+        """Show text strings with individual glyph positioning."""
         self.stream.append(b'[' + _to_bytes(text) + b'] TJ')
+
+    def show_text_string(self, text):
+        """Show single text string."""
+        self.stream.append(String(text).data + b' Tj')
 
     def stroke(self):
         """Stroke path."""
