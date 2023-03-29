@@ -60,9 +60,7 @@ class Object:
     @property
     def compressible(self):
         """Whether the object can be included in an object stream."""
-        if self.generation or isinstance(self, Stream):
-            return False
-        return True
+        return not self.generation and not isinstance(self, Stream)
 
 
 class Dictionary(Object, dict):
@@ -496,8 +494,7 @@ class PDF:
         :type output: binary :term:`file object`
         :param bytes version: PDF version.
         :param bytes identifier: PDF file identifier.
-        :param bool compress: whether the PDF should use a compact structure
-            based on a compressed object stream for Dictionaries.
+        :param bool compress: whether the PDF uses a compressed object stream.
 
         """
         version = self.version if version is None else _to_bytes(version)
