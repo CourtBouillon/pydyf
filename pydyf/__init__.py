@@ -7,6 +7,7 @@ import re
 import zlib
 from codecs import BOM_UTF16_BE
 from hashlib import md5
+from math import ceil, log
 
 VERSION = __version__ = '0.5.0'
 
@@ -21,7 +22,7 @@ def _to_bytes(item):
         if item.is_integer():
             return f'{int(item):d}'.encode('ascii')
         else:
-            return f'{item:f}'.encode('ascii')
+            return f'{item:f}'.rstrip('0').encode('ascii')
     elif isinstance(item, int):
         return f'{item:d}'.encode('ascii')
     return str(item).encode('ascii')
@@ -43,24 +44,23 @@ class Object:
     @property
     def indirect(self):
         """Indirect representation of an object."""
-        return b'\n'.join((
-            str(self.number).encode() + b' ' +
-            str(self.generation).encode() + b' obj',
-            self.data,
-            b'endobj',
-        ))
+        header = f'{self.number} {self.generation} obj\n'.encode()
+        return header + self.data + b'\nendobj'
 
     @property
     def reference(self):
         """Object identifier."""
-        return (
-            str(self.number).encode() + b' ' +
-            str(self.generation).encode() + b' R')
+        return f'{self.number} {self.generation} R'.encode()
 
     @property
     def data(self):
         """Data contained in the object. Shall be defined in each subclass."""
         raise NotImplementedError()
+
+    @property
+    def compressible(self):
+        """Whether the object can be included in an object stream."""
+        return not self.generation and not isinstance(self, Stream)
 
 
 class Dictionary(Object, dict):
@@ -71,11 +71,10 @@ class Dictionary(Object, dict):
 
     @property
     def data(self):
-        result = [b'<<']
-        for key, value in self.items():
-            result.append(b'/' + _to_bytes(key) + b' ' + _to_bytes(value))
-        result.append(b'>>')
-        return b'\n'.join(result)
+        result = [
+            b'/' + _to_bytes(key) + b' ' + _to_bytes(value)
+            for key, value in self.items()]
+        return b'<<' + b''.join(result) + b'>>'
 
 
 class Stream(Object):
@@ -369,7 +368,7 @@ class Stream(Object):
         extra = Dictionary(self.extra.copy())
         if self.compress:
             extra['Filter'] = '/FlateDecode'
-            compressobj = zlib.compressobj()
+            compressobj = zlib.compressobj(level=9)
             stream = compressobj.compress(stream)
             stream += compressobj.flush()
         extra['Length'] = len(stream)
@@ -405,11 +404,7 @@ class Array(Object, list):
 
     @property
     def data(self):
-        result = [b'[']
-        for child in self:
-            result.append(_to_bytes(child))
-        result.append(b']')
-        return b' '.join(result)
+        return b'[' + b' '.join(_to_bytes(child) for child in self) + b']'
 
 
 class PDF:
@@ -492,13 +487,14 @@ class PDF:
         self.current_position += len(content) + 1
         output.write(content + b'\n')
 
-    def write(self, output, version=None, identifier=None):
+    def write(self, output, version=None, identifier=None, compress=False):
         """Write PDF to output.
 
         :param output: Output stream.
         :type output: binary :term:`file object`
         :param bytes version: PDF version.
         :param bytes identifier: PDF file identifier.
+        :param bool compress: whether the PDF uses a compressed object stream.
 
         """
         version = self.version if version is None else _to_bytes(version)
@@ -508,36 +504,110 @@ class PDF:
         self.write_line(b'%PDF-' + version, output)
         self.write_line(b'%\xf0\x9f\x96\xa4', output)
 
-        # Write all non-free PDF objects
-        for object_ in self.objects:
-            if object_.free == 'f':
-                continue
-            object_.offset = self.current_position
-            self.write_line(object_.indirect, output)
+        if version >= b'1.5' and compress:
+            # Store compressed objects for later and write other ones in PDF
+            compressed_objects = []
+            for object_ in self.objects:
+                if object_.free == 'f':
+                    continue
+                if object_.compressible:
+                    compressed_objects.append(object_)
+                else:
+                    object_.offset = self.current_position
+                    self.write_line(object_.indirect, output)
 
-        # Write cross reference table
-        self.xref_position = self.current_position
-        self.write_line(b'xref', output)
-        self.write_line(f'0 {len(self.objects)}'.encode(), output)
-        for object_ in self.objects:
-            self.write_line(
-                (f'{object_.offset:010} {object_.generation:05} '
-                 f'{object_.free} ').encode(), output)
+            # Write compressed objects in object stream
+            stream = [[]]
+            position = 0
+            for i, object_ in enumerate(compressed_objects):
+                data = object_.data
+                stream.append(data)
+                stream[0].append(object_.number)
+                stream[0].append(position)
+                position += len(data) + 1
+            stream[0] = ' '.join(str(i) for i in stream[0])
+            extra = {
+                'Type': '/ObjStm',
+                'N': len(compressed_objects),
+                'First': len(stream[0]) + 1,
+            }
+            object_stream = Stream(stream, extra, compress)
+            object_stream.offset = self.current_position
+            self.add_object(object_stream)
+            self.write_line(object_stream.indirect, output)
 
-        # Write trailer
-        self.write_line(b'trailer', output)
-        self.write_line(b'<<', output)
-        self.write_line(f'/Size {len(self.objects)}'.encode(), output)
-        self.write_line(b'/Root ' + self.catalog.reference, output)
-        self.write_line(b'/Info ' + self.info.reference, output)
-        if identifier is not None:
-            data = b''.join(
-                obj.data for obj in self.objects if obj.free != 'f')
-            data_hash = md5(data).hexdigest().encode()
-            self.write_line(
-                b'/ID [' + String(identifier).data + b' ' +
-                String(data_hash).data + b']', output)
-        self.write_line(b'>>', output)
+            # Write cross-reference stream
+            xref = []
+            dict_index = 0
+            for object_ in self.objects:
+                if object_.compressible:
+                    xref.append((2, object_stream.number, dict_index))
+                    dict_index += 1
+                else:
+                    xref.append((
+                        bool(object_.number), object_.offset,
+                        object_.generation))
+            xref.append((1, self.current_position, 0))
+
+            field2_size = ceil(log(self.current_position, 8))
+            max_generation = max(
+                object_.generation for object_ in self.objects)
+            field3_size = ceil(log(
+                max(max_generation, len(compressed_objects)), 8))
+            xref_lengths = (1, field2_size, field3_size)
+            xref_stream = b''.join(
+                value.to_bytes(length, 'big')
+                for line in xref for length, value in zip(xref_lengths, line))
+            extra = {
+                'Type': '/XRef',
+                'Index': Array((0, len(self.objects) + 1)),
+                'W': Array(xref_lengths),
+                'Size': len(self.objects) + 1,
+                'Root': self.catalog.reference,
+                'Info': self.info.reference,
+            }
+            if identifier is not None:
+                data = b''.join(
+                    obj.data for obj in self.objects if obj.free != 'f')
+                data_hash = md5(data).hexdigest().encode()
+                extra['ID'] = Array((
+                    String(identifier).data, String(data_hash).data))
+            dict_stream = Stream([xref_stream], extra, compress)
+            self.xref_position = dict_stream.offset = self.current_position
+            self.add_object(dict_stream)
+            self.write_line(dict_stream.indirect, output)
+        else:
+            # Write all non-free PDF objects
+            for object_ in self.objects:
+                if object_.free == 'f':
+                    continue
+                object_.offset = self.current_position
+                self.write_line(object_.indirect, output)
+
+            # Write cross-reference table
+            self.xref_position = self.current_position
+            self.write_line(b'xref', output)
+            self.write_line(f'0 {len(self.objects)}'.encode(), output)
+            for object_ in self.objects:
+                self.write_line(
+                    (f'{object_.offset:010} {object_.generation:05} '
+                     f'{object_.free} ').encode(), output)
+
+            # Write trailer
+            self.write_line(b'trailer', output)
+            self.write_line(b'<<', output)
+            self.write_line(f'/Size {len(self.objects)}'.encode(), output)
+            self.write_line(b'/Root ' + self.catalog.reference, output)
+            self.write_line(b'/Info ' + self.info.reference, output)
+            if identifier is not None:
+                data = b''.join(
+                    obj.data for obj in self.objects if obj.free != 'f')
+                data_hash = md5(data).hexdigest().encode()
+                self.write_line(
+                    b'/ID [' + String(identifier).data + b' ' +
+                    String(data_hash).data + b']', output)
+            self.write_line(b'>>', output)
+
         self.write_line(b'startxref', output)
         self.write_line(f'{self.xref_position}'.encode(), output)
         self.write_line(b'%%EOF', output)
