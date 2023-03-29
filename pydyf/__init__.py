@@ -569,6 +569,12 @@ class PDF:
                 'Root': self.catalog.reference,
                 'Info': self.info.reference,
             }
+            if identifier is not None:
+                data = b''.join(
+                    obj.data for obj in self.objects if obj.free != 'f')
+                data_hash = md5(data).hexdigest().encode()
+                extra['ID'] = Array((
+                    String(identifier).data, String(data_hash).data))
             dict_stream = Stream([xref_stream], extra, compress)
             self.xref_position = dict_stream.offset = self.current_position
             self.add_object(dict_stream)
