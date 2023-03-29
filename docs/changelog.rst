@@ -2,6 +2,40 @@ Changelog
 =========
 
 
+Version 0.6.0
+-------------
+
+Released on 2023-03-29.
+
+New features:
+
+* Add an option to use compressed object streams for PDF 1.5+, with financial support from Code & Co.
+* Add new text operators
+* Clean and fix documentation
+
+Backers and sponsors:
+
+* Kobalt
+* Grip Angebotssoftware
+* Spacinov
+* Crisp BV
+* Castedo Ellerman
+* Manuel Barkhau
+* SimonSoft
+* Menutech
+* KontextWork
+* NCC Group
+* René Fritz
+* Moritz Mahringer
+* Yanal-Yvez Fargialla
+* Piotr Horzycki
+* Healthchecks.io
+* Hammerbacher
+* TrainingSparkle
+* Synapsium
+
+
+
 Version 0.5.0
 -------------
 
