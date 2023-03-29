@@ -532,7 +532,7 @@ class PDF:
             extra = {
                 'Type': '/ObjStm',
                 'N': len(compressed_objects),
-                'First': len(stream[0]),
+                'First': len(stream[0]) + 1,
             }
             object_stream = Stream(stream, extra, compress)
             object_stream.offset = self.current_position
