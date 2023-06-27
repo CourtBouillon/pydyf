@@ -549,11 +549,11 @@ class PDF:
                         object_.generation))
             xref.append((1, self.current_position, 0))
 
-            field2_size = ceil(log(self.current_position, 8))
+            field2_size = ceil(log(self.current_position + 1, 256))
             max_generation = max(
                 object_.generation for object_ in self.objects)
             field3_size = ceil(log(
-                max(max_generation, len(compressed_objects)), 8))
+                max(max_generation, len(compressed_objects)) + 1, 256))
             xref_lengths = (1, field2_size, field3_size)
             xref_stream = b''.join(
                 value.to_bytes(length, 'big')
