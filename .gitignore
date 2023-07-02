@@ -1,4 +1,5 @@
 /docs/_build
 /tests/results
+/dist/
 __pycache__
 .coverage
