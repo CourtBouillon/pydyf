@@ -2,6 +2,41 @@ Changelog
 =========
 
 
+Version 0.7.0
+-------------
+
+Released on 2023-07-03.
+
+Dependencies:
+
+* Python 3.11 is supported and tested
+
+Bug fixes:
+
+* Fix size of fields for xref
+
+Backers and sponsors:
+
+* Castedo Ellerman
+* Spacinov
+* Kobalt
+* Grip Angebotssoftware
+* Crisp BV
+* Manuel Barkhau
+* SimonSoft
+* Menutech
+* KontextWork
+* NCC Group
+* René Fritz
+* TrainingSparkle
+* Healthchecks.io
+* Moritz Mahringer
+* Yanal-Yvez Fargialla
+* Synapsium
+* Piotr Horzycki
+* Hammerbacher
+
+
 Version 0.6.0
 -------------
 
