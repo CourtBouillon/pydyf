@@ -2,6 +2,39 @@ Changelog
 =========
 
 
+Version 0.8.0
+-------------
+
+Released on 2023-09-25.
+
+New features:
+
+* Add text rise operator
+
+Backers and sponsors:
+
+* Spacinov
+* Kobalt
+* Grip Angebotssoftware
+* Manuel Barkhau
+* SimonSoft
+* Menutech
+* KontextWork
+* NCC Group
+* René Fritz
+* Nicola Auchmuty
+* Syslifters
+* Hammerbacher
+* TrainingSparkle
+* Daniel Kucharski
+* Healthchecks.io
+* Yanal-Yvez Fargialla
+* WakaTime
+* Paheko
+* Synapsium
+* DocRaptor
+
+
 Version 0.7.0
 -------------
 
