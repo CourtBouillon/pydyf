@@ -16,15 +16,13 @@ def _to_bytes(item):
     """Convert item to bytes."""
     if isinstance(item, bytes):
         return item
-    elif isinstance(item, Object):
-        return item.data
     elif isinstance(item, float):
         if item.is_integer():
-            return f'{int(item):d}'.encode('ascii')
+            return str(int(item)).encode('ascii')
         else:
             return f'{item:f}'.rstrip('0').encode('ascii')
-    elif isinstance(item, int):
-        return f'{item:d}'.encode('ascii')
+    elif isinstance(item, Object):
+        return item.data
     return str(item).encode('ascii')
 
 
