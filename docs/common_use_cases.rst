@@ -213,3 +213,53 @@ Add metadata
     # 550 bytes PDF
     with open('metadata.pdf', 'wb') as f:
         document.write(f)
+
+
+Display inline QR-code image
+----------------------------
+
+.. code-block:: python
+
+    import pydyf
+    import qrcode
+
+    # Create a QR code image
+    image = qrcode.make('Some data here')
+    raw_data = image.tobytes()
+    width = image.size[0]
+    height = image.size[1]
+
+    document = pydyf.PDF()
+    stream = pydyf.Stream(compress=True)
+    stream.push_state()
+    x = 0
+    y = 0
+    stream.transform(width, 0, 0, height, x, y)
+    # Add the 1-bit grayscale image inline in the PDF
+    stream.inline_image(width, height, 1, raw_data)
+    stream.pop_state()
+    document.add_object(stream)
+
+    # Put the image in the resources of the PDF
+    document.add_page(
+        pydyf.Dictionary(
+            {
+                "Type": "/Page",
+                "Parent": document.pages.reference,
+                "MediaBox": pydyf.Array([0, 0, 400, 400]),
+                "Resources": pydyf.Dictionary(
+                    {
+                        "ProcSet": pydyf.Array(
+                            ["/PDF", "/ImageB", "/ImageC", "/ImageI"]
+                        ),
+                    }
+                ),
+                "Contents": stream.reference,
+            }
+        )
+    )
+
+    # 909 bytes PDF
+    with open("qrcode.pdf", "wb") as f:
+        document.write(f, compress=True)
+
