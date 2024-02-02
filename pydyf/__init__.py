@@ -3,6 +3,7 @@ A low-level PDF generator.
 
 """
 
+import base64
 import re
 import zlib
 from codecs import BOM_UTF16_BE
@@ -363,6 +364,41 @@ class Stream(Object):
         self.stream.append(b' '.join((
             _to_bytes(a), _to_bytes(b), _to_bytes(c),
             _to_bytes(d), _to_bytes(e), _to_bytes(f), b'cm')))
+
+    def inline_image(self, width, height, bpc, raw_data):
+        """Add an inline image.
+
+        :param width: The width of the image.
+        :type width: :obj:`int`
+        :param height: The height of the image.
+        :type width: :obj:`int`
+        :param bpc: The bits per component. 1 for BW, 8 for grayscale.
+        :type width: :obj:`int`
+        :param raw_data: The raw pixel data.
+
+        """
+        if self.compress:
+            data = zlib.compress(raw_data)
+        else:
+            data = raw_data
+        enc_data = base64.a85encode(data).decode("ascii")
+        self.stream.append(
+            " ".join(
+                (
+                    "BI",
+                    f"/W {width}",
+                    f"/H {height}",
+                    f"/BPC {bpc}",
+                    "/CS",
+                    "/DeviceGray",
+                    "/F",
+                    "[/A85 /Fl]" if self.compress else "/A85",
+                    "ID",
+                    enc_data,
+                    "EI",
+                )
+            )
+        )
 
     @property
     def data(self):
