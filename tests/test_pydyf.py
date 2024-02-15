@@ -1,4 +1,5 @@
 import io
+import re
 
 import pydyf
 
@@ -704,11 +705,24 @@ def test_text():
     ''')
 
 
-def test_identifier():
+def test_default_identifier():
+    document = pydyf.PDF()
+    pdf = io.BytesIO()
+    document.write(pdf, identifier=None)
+    assert re.search(
+        b'/ID \\[\\((?P<hash>[0-9a-f]{32})\\) \\((?P=hash)\\)\\]',
+        pdf.getvalue()
+    ) is not None
+
+
+def test_custom_identifier():
     document = pydyf.PDF()
     pdf = io.BytesIO()
     document.write(pdf, identifier=b'abc')
-    assert b'abc' in pdf.getvalue()
+    assert re.search(
+        b'/ID \\[\\(abc\\) \\(([0-9a-f]{32})\\)\\]',
+        pdf.getvalue()
+    ) is not None
 
 
 def test_version():

@@ -568,12 +568,11 @@ class PDF:
                 'Root': self.catalog.reference,
                 'Info': self.info.reference,
             }
-            if identifier is not None:
-                data = b''.join(
-                    obj.data for obj in self.objects if obj.free != 'f')
-                data_hash = md5(data).hexdigest().encode()
-                extra['ID'] = Array((
-                    String(identifier).data, String(data_hash).data))
+            data = b''.join(
+                obj.data for obj in self.objects if obj.free != 'f')
+            data_hash = md5(data).hexdigest().encode()
+            extra['ID'] = Array((
+                String(identifier or data_hash).data, String(data_hash).data))
             dict_stream = Stream([xref_stream], extra, compress)
             self.xref_position = dict_stream.offset = self.current_position
             self.add_object(dict_stream)
@@ -601,13 +600,12 @@ class PDF:
             self.write_line(f'/Size {len(self.objects)}'.encode(), output)
             self.write_line(b'/Root ' + self.catalog.reference, output)
             self.write_line(b'/Info ' + self.info.reference, output)
-            if identifier is not None:
-                data = b''.join(
-                    obj.data for obj in self.objects if obj.free != 'f')
-                data_hash = md5(data).hexdigest().encode()
-                self.write_line(
-                    b'/ID [' + String(identifier).data + b' ' +
-                    String(data_hash).data + b']', output)
+            data = b''.join(
+                obj.data for obj in self.objects if obj.free != 'f')
+            data_hash = md5(data).hexdigest().encode()
+            self.write_line(
+                b'/ID [' + String(identifier or data_hash).data + b' ' +
+                String(data_hash).data + b']', output)
             self.write_line(b'>>', output)
 
         self.write_line(b'startxref', output)
