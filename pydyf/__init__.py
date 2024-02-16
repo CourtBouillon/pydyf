@@ -371,9 +371,9 @@ class Stream(Object):
         :param width: The width of the image.
         :type width: :obj:`int`
         :param height: The height of the image.
-        :type width: :obj:`int`
+        :type height: :obj:`int`
         :param bpc: The bits per component. 1 for BW, 8 for grayscale.
-        :type width: :obj:`int`
+        :type bpc: :obj:`int`
         :param raw_data: The raw pixel data.
 
         """
