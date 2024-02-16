@@ -394,8 +394,7 @@ class Stream(Object):
                     b'/F',
                     b'[/A85 /Fl]' if self.compress else b'/A85',
                     b'ID',
-                    enc_data,
-                    b'~>',
+                    enc_data + b'~>',
                     b'EI',
                 )
             )
