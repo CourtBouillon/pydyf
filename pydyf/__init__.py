@@ -393,6 +393,7 @@ class Stream(Object):
                     b'/DeviceGray',
                     b'/F',
                     b'[/A85 /Fl]' if self.compress else b'/A85',
+                    b'/L', _to_bytes(len(enc_data) + 2),
                     b'ID',
                     enc_data + b'~>',
                     b'EI',
