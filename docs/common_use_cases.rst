@@ -191,25 +191,25 @@ Add metadata
     import pydyf
 
     document = pydyf.PDF()
-    document.info["Author"] = pydyf.String("Jane Doe")
-    document.info["Creator"] = pydyf.String("pydyf")
-    document.info["Keywords"] = pydyf.String("some keywords")
-    document.info["Producer"] = pydyf.String("The producer")
-    document.info["Subject"] = pydyf.String("An example PDF")
-    document.info["Title"] = pydyf.String("A PDF containing metadata")
+    document.info['Author'] = pydyf.String('Jane Doe')
+    document.info['Creator'] = pydyf.String('pydyf')
+    document.info['Keywords'] = pydyf.String('some keywords')
+    document.info['Producer'] = pydyf.String('The producer')
+    document.info['Subject'] = pydyf.String('An example PDF')
+    document.info['Title'] = pydyf.String('A PDF containing metadata')
     now = datetime.datetime.now()
-    document.info["CreationDate"] = pydyf.String(now.strftime("D:%Y%m%d%H%M%S"))
+    document.info['CreationDate'] = pydyf.String(now.strftime('D:%Y%m%d%H%M%S'))
 
     document.add_page(
         pydyf.Dictionary(
             {
-                "Type": "/Page",
-                "Parent": document.pages.reference,
-                "MediaBox": pydyf.Array([0, 0, 200, 200]),
+                'Type': '/Page',
+                'Parent': document.pages.reference,
+                'MediaBox': pydyf.Array([0, 0, 200, 200]),
             }
         )
     )
 
     # 550 bytes PDF
-    with open("metadata.pdf", "wb") as f:
+    with open('metadata.pdf', 'wb') as f:
         document.write(f)
