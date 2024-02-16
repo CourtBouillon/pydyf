@@ -236,7 +236,7 @@ Display inline QR-code image
     y = 0
     stream.transform(width, 0, 0, height, x, y)
     # Add the 1-bit grayscale image inline in the PDF
-    stream.inline_image(width, height, 1, raw_data)
+    stream.inline_image(width, height, 'Gray', 1, raw_data)
     stream.pop_state()
     document.add_object(stream)
 

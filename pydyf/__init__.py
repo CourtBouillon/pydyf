@@ -365,13 +365,15 @@ class Stream(Object):
             _to_bytes(a), _to_bytes(b), _to_bytes(c),
             _to_bytes(d), _to_bytes(e), _to_bytes(f), b'cm')))
 
-    def inline_image(self, width, height, bpc, raw_data):
+    def inline_image(self, width, height, color_space, bpc, raw_data):
         """Add an inline image.
 
         :param width: The width of the image.
         :type width: :obj:`int`
         :param height: The height of the image.
         :type height: :obj:`int`
+        :param colorspace: The color space of the image, f.e. RGB, Gray.
+        :type colorspace: :obj:`str`
         :param bpc: The bits per component. 1 for BW, 8 for grayscale.
         :type bpc: :obj:`int`
         :param raw_data: The raw pixel data.
@@ -390,7 +392,7 @@ class Stream(Object):
                     b'/H', _to_bytes(height),
                     b'/BPC', _to_bytes(bpc),
                     b'/CS',
-                    b'/DeviceGray',
+                    b'/Device' + color_space.encode(),
                     b'/F',
                     b'[/A85 /Fl]' if self.compress else b'/A85',
                     b'/L', _to_bytes(len(enc_data) + 2),
