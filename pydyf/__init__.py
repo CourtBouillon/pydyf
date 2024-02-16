@@ -381,22 +381,22 @@ class Stream(Object):
             data = zlib.compress(raw_data)
         else:
             data = raw_data
-        enc_data = base64.a85encode(data).decode('ascii')
+        enc_data = base64.a85encode(data)
         self.stream.append(
-            ' '.join(
+            b' '.join(
                 (
-                    'BI',
-                    f'/W {width}',
-                    f'/H {height}',
-                    f'/BPC {bpc}',
-                    '/CS',
-                    '/DeviceGray',
-                    '/F',
-                    '[/A85 /Fl]' if self.compress else '/A85',
-                    'ID',
+                    b'BI',
+                    b'/W', _to_bytes(width),
+                    b'/H', _to_bytes(height),
+                    b'/BPC', _to_bytes(bpc),
+                    b'/CS',
+                    b'/DeviceGray',
+                    b'/F',
+                    b'[/A85 /Fl]' if self.compress else b'/A85',
+                    b'ID',
                     enc_data,
-                    '~>',
-                    'EI',
+                    b'~>',
+                    b'EI',
                 )
             )
         )
