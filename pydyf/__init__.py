@@ -395,6 +395,7 @@ class Stream(Object):
                     "[/A85 /Fl]" if self.compress else "/A85",
                     "ID",
                     enc_data,
+                    "~>",
                     "EI",
                 )
             )
