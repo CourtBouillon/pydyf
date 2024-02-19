@@ -244,22 +244,22 @@ Display inline QR-code image
     document.add_page(
         pydyf.Dictionary(
             {
-                "Type": "/Page",
-                "Parent": document.pages.reference,
-                "MediaBox": pydyf.Array([0, 0, 400, 400]),
-                "Resources": pydyf.Dictionary(
+                'Type': '/Page',
+                'Parent': document.pages.reference,
+                'MediaBox': pydyf.Array([0, 0, 400, 400]),
+                'Resources': pydyf.Dictionary(
                     {
-                        "ProcSet": pydyf.Array(
-                            ["/PDF", "/ImageB", "/ImageC", "/ImageI"]
+                        'ProcSet': pydyf.Array(
+                            ['/PDF', '/ImageB', '/ImageC', '/ImageI']
                         ),
                     }
                 ),
-                "Contents": stream.reference,
+                'Contents': stream.reference,
             }
         )
     )
 
     # 909 bytes PDF
-    with open("qrcode.pdf", "wb") as f:
+    with open('qrcode.pdf', 'wb') as f:
         document.write(f, compress=True)
 
