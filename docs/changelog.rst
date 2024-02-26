@@ -2,6 +2,55 @@ Changelog
 =========
 
 
+Version 0.9.0
+-------------
+
+Released on 2024-02-26.
+
+Dependencies:
+
+* Python 3.12 is supported and tested
+* Python 3.8+ is now needed, Python 3.7 is not supported anymore
+
+New features:
+
+* Add inline images support
+
+Performance:
+
+* Simplify `_to_bytes()`
+
+Documentation:
+
+* Add sample to create a PDF with metadata
+
+Contributors:
+
+* Panagiotis H.M. Issaris
+* Guillaume Ayoub
+* Lucie Anglade
+
+Backers and sponsors:
+
+* Spacinov
+* Kobalt
+* Grip Angebotssoftware
+* Manuel Barkhau
+* SimonSoft
+* Menutech
+* KontextWork
+* René Fritz
+* Simon Sapin
+* Arcanite
+* TrainingSparkle
+* Healthchecks.io
+* Hammerbacher
+* Docraptor
+* Yanal-Yvez Fargialla
+* Morntag
+* NBCO
+
+
 Version 0.8.0
 -------------
 
