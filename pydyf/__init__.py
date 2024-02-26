@@ -411,11 +411,14 @@ class Array(Object, list):
 
 class PDF:
     """PDF document."""
-    def __init__(self, version=b'1.7', identifier=None):
+    def __init__(self, version=b'1.7', identifier=False):
         """Create a PDF document.
 
         :param bytes version: PDF version.
-        :param bytes identifier: PDF file identifier.
+        :param identifier: PDF file identifier. Default is :obj:`False`
+          to include no identifier, can be set to :obj:`True` to generate an
+          automatic identifier.
+        :type identifier: :obj:`bytes` or :obj:`bool`
 
         """
         #: PDF version, as :obj:`bytes`.
@@ -489,18 +492,21 @@ class PDF:
         self.current_position += len(content) + 1
         output.write(content + b'\n')
 
-    def write(self, output, version=None, identifier=None, compress=False):
+    def write(self, output, version=None, identifier=False, compress=False):
         """Write PDF to output.
 
         :param output: Output stream.
         :type output: binary :term:`file object`
         :param bytes version: PDF version.
-        :param bytes identifier: PDF file identifier.
+        :param identifier: PDF file identifier. Default is :obj:`False`
+          to include no identifier, can be set to :obj:`True` to generate an
+          automatic identifier.
+        :type identifier: :obj:`bytes` or :obj:`bool`
         :param bool compress: whether the PDF uses a compressed object stream.
 
         """
         version = self.version if version is None else _to_bytes(version)
-        identifier = self.identifier if identifier is None else identifier
+        identifier = self.identifier or identifier
 
         # Write header
         self.write_line(b'%PDF-' + version, output)
@@ -568,11 +574,14 @@ class PDF:
                 'Root': self.catalog.reference,
                 'Info': self.info.reference,
             }
-            data = b''.join(
-                obj.data for obj in self.objects if obj.free != 'f')
-            data_hash = md5(data).hexdigest().encode()
-            extra['ID'] = Array((
-                String(identifier or data_hash).data, String(data_hash).data))
+            if identifier:
+                data = b''.join(
+                    obj.data for obj in self.objects if obj.free != 'f')
+                data_hash = md5(data).hexdigest().encode()
+                if identifier is True:
+                    identifier = data_hash
+                extra['ID'] = Array((
+                    String(identifier).data, String(data_hash).data))
             dict_stream = Stream([xref_stream], extra, compress)
             self.xref_position = dict_stream.offset = self.current_position
             self.add_object(dict_stream)
@@ -600,12 +609,15 @@ class PDF:
             self.write_line(f'/Size {len(self.objects)}'.encode(), output)
             self.write_line(b'/Root ' + self.catalog.reference, output)
             self.write_line(b'/Info ' + self.info.reference, output)
-            data = b''.join(
-                obj.data for obj in self.objects if obj.free != 'f')
-            data_hash = md5(data).hexdigest().encode()
-            self.write_line(
-                b'/ID [' + String(identifier or data_hash).data + b' ' +
-                String(data_hash).data + b']', output)
+            if identifier:
+                data = b''.join(
+                    obj.data for obj in self.objects if obj.free != 'f')
+                data_hash = md5(data).hexdigest().encode()
+                if identifier is True:
+                    identifier = data_hash
+                self.write_line(
+                    b'/ID [' + String(identifier).data + b' ' +
+                    String(data_hash).data + b']', output)
             self.write_line(b'>>', output)
 
         self.write_line(b'startxref', output)

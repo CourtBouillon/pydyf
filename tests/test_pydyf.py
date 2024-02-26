@@ -705,10 +705,20 @@ def test_text():
     ''')
 
 
+def test_no_identifier():
+    document = pydyf.PDF()
+    pdf = io.BytesIO()
+    document.write(pdf, identifier=False)
+    assert re.search(
+        b'/ID \\[\\((?P<hash>[0-9a-f]{32})\\) \\((?P=hash)\\)\\]',
+        pdf.getvalue()
+    ) is None
+
+
 def test_default_identifier():
     document = pydyf.PDF()
     pdf = io.BytesIO()
-    document.write(pdf, identifier=None)
+    document.write(pdf, identifier=True)
     assert re.search(
         b'/ID \\[\\((?P<hash>[0-9a-f]{32})\\) \\((?P=hash)\\)\\]',
         pdf.getvalue()
