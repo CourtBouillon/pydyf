@@ -450,21 +450,8 @@ class Array(Object, list):
 
 class PDF:
     """PDF document."""
-    def __init__(self, version=b'1.7', identifier=False):
-        """Create a PDF document.
-
-        :param bytes version: PDF version.
-        :param identifier: PDF file identifier. Default is :obj:`False`
-          to include no identifier, can be set to :obj:`True` to generate an
-          automatic identifier.
-        :type identifier: :obj:`bytes` or :obj:`bool`
-
-        """
-        #: PDF version, as :obj:`bytes`.
-        self.version = _to_bytes(version)
-        #: PDF file identifier.
-        self.identifier = identifier
-
+    def __init__(self):
+        """Create a PDF document."""
         #: Python :obj:`list` containing the PDF’s objects.
         self.objects = []
 
@@ -531,7 +518,7 @@ class PDF:
         self.current_position += len(content) + 1
         output.write(content + b'\n')
 
-    def write(self, output, version=None, identifier=False, compress=False):
+    def write(self, output, version=b'1.7', identifier=False, compress=False):
         """Write PDF to output.
 
         :param output: Output stream.
@@ -544,8 +531,10 @@ class PDF:
         :param bool compress: whether the PDF uses a compressed object stream.
 
         """
-        version = self.version if version is None else _to_bytes(version)
-        identifier = self.identifier or identifier
+        # Convert version and identifier to bytes
+        version = _to_bytes(version)
+        if identifier not in (False, True, None):
+            identifier = _to_bytes(identifier)
 
         # Write header
         self.write_line(b'%PDF-' + version, output)
