@@ -525,7 +525,7 @@ class PDF:
 
         """
         # Convert version and identifier to bytes
-        version = _to_bytes(version)
+        version = _to_bytes(version or b'1.7')  # Force 1.7 when None
         if identifier not in (False, True, None):
             identifier = _to_bytes(identifier)
 
