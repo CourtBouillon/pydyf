@@ -50,16 +50,13 @@ You can launch tests using the following command::
 
   venv/bin/pytest
 
-WeasyPrint also uses isort_ to check imports and flake8_ to check the coding
-style::
+pydyf also uses ruff_ to check the coding style::
 
-  venv/bin/python -m isort . --check --diff
-  venv/bin/python -m flake8
+  venv/bin/python -m ruff check
 
 .. _pytest: https://docs.pytest.org/
 .. _Ghostscript: https://www.ghostscript.com/
-.. _isort: https://pycqa.github.io/isort/
-.. _flake8: https://flake8.pycqa.org/
+.. _ruff: https://docs.astral.sh/ruff/
 
 
 Documentation
