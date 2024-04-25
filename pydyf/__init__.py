@@ -9,6 +9,7 @@ import zlib
 from codecs import BOM_UTF16_BE
 from hashlib import md5
 from math import ceil, log
+from warnings import warn
 
 VERSION = __version__ = '0.9.0'
 
@@ -443,8 +444,17 @@ class Array(Object, list):
 
 class PDF:
     """PDF document."""
-    def __init__(self):
+    def __init__(self, version=None, identifier=None):
         """Create a PDF document."""
+        if version or identifier:  # to be removed in next version
+            warn(
+                "PDF objects don’t take version or identifier during initialization "
+                "anymore. These properties are now stored but ignored, and will be "
+                "removed and rejected in next version of pydyf. Please pass these "
+                "properties to the PDF.write() method instead.", DeprecationWarning)
+        self.version = _to_bytes(version) if version else b'1.7'  # to be removed
+        self.identifier = identifier  # to be removed
+
         #: Python :obj:`list` containing the PDF’s objects.
         self.objects = []
 
