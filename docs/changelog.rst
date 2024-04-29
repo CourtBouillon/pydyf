@@ -2,6 +2,40 @@ Changelog
 =========
 
 
+Version 0.10.0
+-------------
+
+Released on 2024-04-29.
+
+New features:
+
+* Add standard compliant default identifier
+
+Contributors:
+
+* Guillaume Ayoub
+* Wolfgang Walther
+
+Backers and sponsors:
+
+* Spacinov
+* Kobalt
+* Grip Angebotssoftware
+* Manuel Barkhau
+* SimonSoft
+* Menutech
+* KontextWork
+* Simon Sapin
+* René Fritz
+* TrainingSparkle
+* Healthchecks.io
+* Docraptor
+* Yanal-Yvez Fargialla
+* Douwe van Loenen
+* Morntag
+* Xavid
+
+
 Version 0.9.0
 -------------
 
