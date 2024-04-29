@@ -3,7 +3,7 @@ Changelog
 
 
 Version 0.10.0
--------------
+--------------
 
 Released on 2024-04-29.
 
