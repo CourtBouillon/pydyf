@@ -281,14 +281,17 @@ class Stream(Object):
             _to_bytes(r), _to_bytes(g), _to_bytes(b),
             (b'RG' if stroke else b'rg'))))
 
-    def set_color_special(self, name, stroke=False):
-        """Set color for nonstroking operations.
+    def set_color_special(self, name, stroke=False, *operands):
+        """Set special color for nonstroking operations.
 
-        Set color for stroking operation if ``stroke`` is set to ``True``.
+        Set special color for stroking operation if ``stroke`` is set to ``True``.
 
         """
+        if name:
+            operands.append(b'/' + _to_bytes(name))
         self.stream.append(
-            b'/' + _to_bytes(name) + b' ' + (b'SCN' if stroke else b'scn'))
+            b' '.join(_to_bytes(operand) for operand in operands) + b' ' +
+            (b'SCN' if stroke else b'scn'))
 
     def set_dash(self, dash_array, dash_phase):
         """Set dash line pattern.
