@@ -122,13 +122,9 @@ class Stream(Object):
         self.stream.append(b'h')
 
     def color_space(self, space, stroke=False):
-        """Set the nonstroking color space.
-
-        If stroke is set to ``True``, set the stroking color space instead.
-
-        """
-        self.stream.append(
-            b'/' + _to_bytes(space) + b' ' + (b'CS' if stroke else b'cs'))
+        """color_space is deprecated, use set_color_space instead."""
+        warn(Stream.color_space.__doc__, DeprecationWarning)
+        self.set_color_space(space, stroke)
 
     def curve_to(self, x1, y1, x2, y2, x3, y3):
         """Add cubic Bézier curve to current path.
@@ -248,6 +244,11 @@ class Stream(Object):
         self.stream.append(b' '.join((_to_bytes(x), _to_bytes(y), b'Td')))
 
     def shading(self, name):
+        """shading is deprecated, use paint_shading instead."""
+        warn(Stream.shading.__doc__, DeprecationWarning)
+        self.paint_shading(name)
+
+    def paint_shading(self, name):
         """Paint shape and color shading using shading dictionary ``name``."""
         self.stream.append(b'/' + _to_bytes(name) + b' sh')
 
@@ -280,6 +281,15 @@ class Stream(Object):
         self.stream.append(b' '.join((
             _to_bytes(r), _to_bytes(g), _to_bytes(b),
             (b'RG' if stroke else b'rg'))))
+
+    def set_color_space(self, space, stroke=False):
+        """Set the nonstroking color space.
+
+        If stroke is set to ``True``, set the stroking color space instead.
+
+        """
+        self.stream.append(
+            b'/' + _to_bytes(space) + b' ' + (b'CS' if stroke else b'cs'))
 
     def set_color_special(self, name, stroke=False, *operands):
         """Set special color for nonstroking operations.
@@ -330,6 +340,27 @@ class Stream(Object):
         """Set line width."""
         self.stream.append(_to_bytes(width) + b' w')
 
+    def set_matrix(self, a, b, c, d, e, f):
+        """Set current transformation matrix.
+
+        :param a: Top left number in the matrix.
+        :type a: :obj:`int` or :obj:`float`
+        :param b: Top middle number in the matrix.
+        :type b: :obj:`int` or :obj:`float`
+        :param c: Middle left number in the matrix.
+        :type c: :obj:`int` or :obj:`float`
+        :param d: Middle middle number in the matrix.
+        :type d: :obj:`int` or :obj:`float`
+        :param e: Bottom left number in the matrix.
+        :type e: :obj:`int` or :obj:`float`
+        :param f: Bottom middle number in the matrix.
+        :type f: :obj:`int` or :obj:`float`
+
+        """
+        self.stream.append(b' '.join((
+            _to_bytes(a), _to_bytes(b), _to_bytes(c),
+            _to_bytes(d), _to_bytes(e), _to_bytes(f), b'cm')))
+
     def set_miter_limit(self, miter_limit):
         """Set miter limit."""
         self.stream.append(_to_bytes(miter_limit) + b' M')
@@ -342,24 +373,8 @@ class Stream(Object):
         """
         self.stream.append(b'/' + _to_bytes(state_name) + b' gs')
 
-    def show_text(self, text):
-        """Show text strings with individual glyph positioning."""
-        self.stream.append(b'[' + _to_bytes(text) + b'] TJ')
-
-    def show_text_string(self, text):
-        """Show single text string."""
-        self.stream.append(String(text).data + b' Tj')
-
-    def stroke(self):
-        """Stroke path."""
-        self.stream.append(b'S')
-
-    def stroke_and_close(self):
-        """Stroke and close path."""
-        self.stream.append(b's')
-
-    def text_matrix(self, a, b, c, d, e, f):
-        """Set text matrix and text line matrix.
+    def set_text_matrix(self, a, b, c, d, e, f):
+        """Set current text and text line transformation matrix.
 
         :param a: Top left number in the matrix.
         :type a: :obj:`int` or :obj:`float`
@@ -379,26 +394,31 @@ class Stream(Object):
             _to_bytes(a), _to_bytes(b), _to_bytes(c),
             _to_bytes(d), _to_bytes(e), _to_bytes(f), b'Tm')))
 
+    def text_matrix(self, a, b, c, d, e, f):
+        """text_matrix is deprecated, use set_text_matrix instead."""
+        warn(Stream.text_matrix.__doc__, DeprecationWarning)
+        self.set_text_matrix(a, b, c, d, e, f)
+
     def transform(self, a, b, c, d, e, f):
-        """Modify current transformation matrix.
+        """transform is deprecated, use set_matrix instead."""
+        warn(Stream.transform.__doc__, DeprecationWarning)
+        self.set_matrix(a, b, c, d, e, f)
 
-        :param a: Top left number in the matrix.
-        :type a: :obj:`int` or :obj:`float`
-        :param b: Top middle number in the matrix.
-        :type b: :obj:`int` or :obj:`float`
-        :param c: Middle left number in the matrix.
-        :type c: :obj:`int` or :obj:`float`
-        :param d: Middle middle number in the matrix.
-        :type d: :obj:`int` or :obj:`float`
-        :param e: Bottom left number in the matrix.
-        :type e: :obj:`int` or :obj:`float`
-        :param f: Bottom middle number in the matrix.
-        :type f: :obj:`int` or :obj:`float`
+    def show_text(self, text):
+        """Show text strings with individual glyph positioning."""
+        self.stream.append(b'[' + _to_bytes(text) + b'] TJ')
 
-        """
-        self.stream.append(b' '.join((
-            _to_bytes(a), _to_bytes(b), _to_bytes(c),
-            _to_bytes(d), _to_bytes(e), _to_bytes(f), b'cm')))
+    def show_text_string(self, text):
+        """Show single text string."""
+        self.stream.append(String(text).data + b' Tj')
+
+    def stroke(self):
+        """Stroke path."""
+        self.stream.append(b'S')
+
+    def stroke_and_close(self):
+        """Stroke and close path."""
+        self.stream.append(b's')
 
     @property
     def data(self):

@@ -282,11 +282,11 @@ def test_curve_end_to():
     ''')
 
 
-def test_transform():
+def test_set_matrix():
     document = pydyf.PDF()
 
     draw = pydyf.Stream()
-    draw.transform(1, 0, 0, 1, 1, 1)
+    draw.set_matrix(1, 0, 0, 1, 1, 1)
     draw.move_to(2, 2)
     draw.set_line_width(2)
     draw.line_to(2, 5)
@@ -673,7 +673,7 @@ def test_text():
     draw = pydyf.Stream()
     draw.begin_text()
     draw.set_font_size('F1', 200)
-    draw.text_matrix(1, 0, 0, 1, -20, 5)
+    draw.set_text_matrix(1, 0, 0, 1, -20, 5)
     draw.show_text(pydyf.String('l'))
     draw.show_text(pydyf.String('É'))
     draw.end_text()

@@ -34,7 +34,7 @@ Draw rectangles and lines
    draw.rectangle(50, 50, 20, 40)
    draw.set_dash([], 0)
    draw.set_line_width(10)
-   draw.transform(1, 0, 0, 1, 80, 80)
+   draw.set_matrix(1, 0, 0, 1, 80, 80)
    draw.fill()
 
    # Add the stream with the two rectangles into the document
@@ -73,7 +73,7 @@ Add some color
    draw.rectangle(50, 50, 20, 40)
    draw.set_dash([], 0)
    draw.set_line_width(10)
-   draw.transform(1, 0, 0, 1, 80, 80)
+   draw.set_matrix(1, 0, 0, 1, 80, 80)
    draw.fill()
 
    document.add_object(draw)
@@ -113,7 +113,7 @@ Display image
 
    image = pydyf.Stream()
    image.push_state()
-   image.transform(100, 0, 0, 100, 100, 100)
+   image.set_matrix(100, 0, 0, 100, 100, 100)
    image.draw_x_object('Im1')
    image.pop_state()
    document.add_object(image)
@@ -159,7 +159,7 @@ Display text
   text = pydyf.Stream()
   text.begin_text()
   text.set_font_size('F1', 20)
-  text.text_matrix(1, 0, 0, 1, 10, 90)
+  text.set_text_matrix(1, 0, 0, 1, 10, 90)
   text.show_text(pydyf.String('Bœuf grillé & café'.encode('macroman')))
   text.end_text()
 
@@ -234,7 +234,7 @@ Display inline QR-code image
     stream.push_state()
     x = 0
     y = 0
-    stream.transform(width, 0, 0, height, x, y)
+    stream.set_matrix(width, 0, 0, height, x, y)
     # Add the 1-bit grayscale image inline in the PDF
     stream.inline_image(width, height, 'Gray', 1, raw_data)
     stream.pop_state()
