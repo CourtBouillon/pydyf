@@ -2,6 +2,43 @@ Changelog
 =========
 
 
+Version 0.11.0
+--------------
+
+Released on
+
+New features:
+
+* Remove deprecated version and identifier parameters
+* Change some function names for consistency
+* Allow extra operands for special colors
+
+Contributors:
+
+* Guillaume Ayoub
+* Lucie Anglade
+
+Backers and sponsors:
+
+* Spacinov
+* Kobalt
+* Grip Angebotssoftware
+* Manuel Barkhau
+* SimonSoft
+* Menutech
+* KontextWork
+* Simon Sapin
+* René Fritz
+* TrainingSparkle
+* Healthchecks.io
+* Hammerbacher
+* Docraptor
+* Advance Insight
+* Yanal-Yvez Fargialla
+* Morntag
+* Xavid
+
+
 Version 0.10.0
 --------------
 

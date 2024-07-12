@@ -11,7 +11,7 @@ from hashlib import md5
 from math import ceil, log
 from warnings import warn
 
-VERSION = __version__ = '0.10.0'
+VERSION = __version__ = '0.11.0'
 
 
 def _to_bytes(item):
