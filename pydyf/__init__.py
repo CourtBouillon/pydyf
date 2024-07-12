@@ -298,7 +298,7 @@ class Stream(Object):
 
         """
         if name:
-            operands.append(b'/' + _to_bytes(name))
+            operands = (*operands, b'/' + _to_bytes(name))
         self.stream.append(
             b' '.join(_to_bytes(operand) for operand in operands) + b' ' +
             (b'SCN' if stroke else b'scn'))
