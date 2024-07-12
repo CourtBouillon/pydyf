@@ -5,7 +5,7 @@ Changelog
 Version 0.11.0
 --------------
 
-Released on
+Released on 2024-07-12.
 
 New features:
 
