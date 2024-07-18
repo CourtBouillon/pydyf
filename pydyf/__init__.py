@@ -578,8 +578,7 @@ class PDF:
                     dict_index += 1
                 else:
                     xref.append((
-                        bool(object_.number), object_.offset,
-                        object_.generation))
+                        bool(object_.number), object_.offset, object_.generation))
             xref.append((1, self.current_position, 0))
 
             field2_size = ceil(log(self.current_position + 1, 256))
@@ -600,13 +599,11 @@ class PDF:
                 'Info': self.info.reference,
             }
             if identifier:
-                data = b''.join(
-                    obj.data for obj in self.objects if obj.free != 'f')
+                data = b''.join(obj.data for obj in self.objects if obj.free != 'f')
                 data_hash = md5(data).hexdigest().encode()
                 if identifier is True:
                     identifier = data_hash
-                extra['ID'] = Array((
-                    String(identifier).data, String(data_hash).data))
+                extra['ID'] = Array((String(identifier).data, String(data_hash).data))
             dict_stream = Stream([xref_stream], extra, compress)
             self.xref_position = dict_stream.offset = self.current_position
             self.add_object(dict_stream)
