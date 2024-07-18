@@ -9,7 +9,6 @@ import zlib
 from codecs import BOM_UTF16_BE
 from hashlib import md5
 from math import ceil, log
-from warnings import warn
 
 VERSION = __version__ = '0.11.0'
 
@@ -120,11 +119,6 @@ class Stream(Object):
 
         """
         self.stream.append(b'h')
-
-    def color_space(self, space, stroke=False):
-        """color_space is deprecated, use set_color_space instead."""
-        warn(Stream.color_space.__doc__, DeprecationWarning)
-        self.set_color_space(space, stroke)
 
     def curve_to(self, x1, y1, x2, y2, x3, y3):
         """Add cubic Bézier curve to current path.
@@ -242,11 +236,6 @@ class Stream(Object):
     def move_text_to(self, x, y):
         """Move text to next line at ``(x, y)`` distance from previous line."""
         self.stream.append(b' '.join((_to_bytes(x), _to_bytes(y), b'Td')))
-
-    def shading(self, name):
-        """shading is deprecated, use paint_shading instead."""
-        warn(Stream.shading.__doc__, DeprecationWarning)
-        self.paint_shading(name)
 
     def paint_shading(self, name):
         """Paint shape and color shading using shading dictionary ``name``."""
@@ -393,16 +382,6 @@ class Stream(Object):
         self.stream.append(b' '.join((
             _to_bytes(a), _to_bytes(b), _to_bytes(c),
             _to_bytes(d), _to_bytes(e), _to_bytes(f), b'Tm')))
-
-    def text_matrix(self, a, b, c, d, e, f):
-        """text_matrix is deprecated, use set_text_matrix instead."""
-        warn(Stream.text_matrix.__doc__, DeprecationWarning)
-        self.set_text_matrix(a, b, c, d, e, f)
-
-    def transform(self, a, b, c, d, e, f):
-        """transform is deprecated, use set_matrix instead."""
-        warn(Stream.transform.__doc__, DeprecationWarning)
-        self.set_matrix(a, b, c, d, e, f)
 
     def show_text(self, text):
         """Show text strings with individual glyph positioning."""
