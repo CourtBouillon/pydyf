@@ -20,9 +20,9 @@ professional support. You want bugs fixed as soon as possible? You projects
 would highly benefit from some new features? You or your team would like to get
 new skills with one of the technologies we master?
 
-Please contact us by mail_, by chat_ or by tweet_ to get in touch and find the
+Please contact us by mail_, by chat_ or by toot_ to get in touch and find the
 best way we can help you.
 
 .. _mail: mailto:contact@courtbouillon.org
-.. _chat: https://gitter.im/CourtBouillon/pydyf
-.. _tweet: https://twitter.com/BouillonCourt
+.. _chat: https://matrix.to/#/#CourtBouillon_WeasyPrint:gitter.im
+.. _toot: https://fosstodon.org/@courtbouillon

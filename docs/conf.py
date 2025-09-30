@@ -98,5 +98,4 @@ texinfo_documents = [
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3/', None),
-    'webencodings': ('https://pythonhosted.org/webencodings/', None),
 }
