@@ -467,7 +467,6 @@ class PDF:
 
         #: PDF :class:`Dictionary` containing the PDF’s metadata.
         self.info = Dictionary({})
-        self.add_object(self.info)
 
         #: PDF :class:`Dictionary` containing references to the other objects.
         self.catalog = Dictionary({
@@ -630,7 +629,9 @@ class PDF:
             self.write_line(b'<<', output)
             self.write_line(f'/Size {len(self.objects)}'.encode(), output)
             self.write_line(b'/Root ' + self.catalog.reference, output)
-            self.write_line(b'/Info ' + self.info.reference, output)
+            if self.info:
+                self.add_object(self.info)
+                self.write_line(b'/Info ' + self.info.reference, output)
             if identifier:
                 data = b''.join(
                     obj.data for obj in self.objects if obj.free != 'f')
