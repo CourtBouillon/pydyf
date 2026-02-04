@@ -39,3 +39,6 @@ jobs:
         run: python -m pytest
       - name: Check coding style
         run: python -m ruff check
+      - name: Check type annotations
+        if: matrix.python-version != 'pypy-3.11'
+        run: mypy pydyf

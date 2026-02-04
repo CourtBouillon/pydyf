@@ -4,16 +4,20 @@ A low-level PDF generator.
 """
 
 import base64
+import io
 import re
+import typing
 import zlib
 from codecs import BOM_UTF16_BE
+from collections.abc import Iterable
 from hashlib import md5
 from math import ceil, log
 
 VERSION = __version__ = '0.12.1'
 
+_SERIALIZABLE = typing.Union[bytes, float, str, "Object"]
 
-def _to_bytes(item):
+def _to_bytes(item: _SERIALIZABLE) -> bytes:
     """Convert item to bytes."""
     if isinstance(item, bytes):
         return item
@@ -29,9 +33,10 @@ def _to_bytes(item):
 
 class Object:
     """Base class for PDF objects."""
-    def __init__(self):
-        #: Number of the object.
-        self.number = None
+    def __init__(self) -> None:
+        #: Number of the object, which is assigned when the object is added
+        #: to the PDF.
+        self.number = 0
         #: Position in the PDF of the object.
         self.offset = 0
         #: Version number of the object, non-negative.
@@ -41,35 +46,35 @@ class Object:
         self.free = 'n'
 
     @property
-    def indirect(self):
+    def indirect(self) -> bytes:
         """Indirect representation of an object."""
         header = f'{self.number} {self.generation} obj\n'.encode()
         return header + self.data + b'\nendobj'
 
     @property
-    def reference(self):
+    def reference(self) -> bytes:
         """Object identifier."""
         return f'{self.number} {self.generation} R'.encode()
 
     @property
-    def data(self):
+    def data(self) -> bytes:
         """Data contained in the object. Shall be defined in each subclass."""
         raise NotImplementedError()
 
     @property
-    def compressible(self):
+    def compressible(self) -> bool:
         """Whether the object can be included in an object stream."""
         return not self.generation and not isinstance(self, Stream)
 
 
-class Dictionary(Object, dict):
+class Dictionary(Object, dict[str, _SERIALIZABLE]):
     """PDF Dictionary object."""
-    def __init__(self, values=None):
+    def __init__(self, values: dict[str, _SERIALIZABLE] | None = None) -> None:
         Object.__init__(self)
         dict.__init__(self, values or {})
 
     @property
-    def data(self):
+    def data(self) -> bytes:
         result = [
             b'/' + _to_bytes(key) + b' ' + _to_bytes(value)
             for key, value in self.items()]
@@ -78,7 +83,12 @@ class Dictionary(Object, dict):
 
 class Stream(Object):
     """PDF Stream object."""
-    def __init__(self, stream=None, extra=None, compress=False):
+    def __init__(
+        self,
+        stream: list[_SERIALIZABLE] | None = None,
+        extra: dict[str, _SERIALIZABLE] | None = None,
+        compress: bool = False,
+    ) -> None:
         super().__init__()
         #: Python array of data composing stream.
         self.stream = stream or []
@@ -87,7 +97,11 @@ class Stream(Object):
         #: Compress the stream data if set to ``True``. Default is ``False``.
         self.compress = compress
 
-    def begin_marked_content(self, tag, property_list=None):
+    def begin_marked_content(
+        self,
+        tag: str,
+        property_list: Dictionary | None = None,
+    ) -> None:
         """Begin marked-content sequence."""
         self.stream.append(f'/{tag}')
         if property_list is None:
@@ -96,11 +110,11 @@ class Stream(Object):
             self.stream.append(property_list)
             self.stream.append(b'BDC')
 
-    def begin_text(self):
+    def begin_text(self) -> None:
         """Begin a text object."""
         self.stream.append(b'BT')
 
-    def clip(self, even_odd=False):
+    def clip(self, even_odd: bool = False) -> None:
         """Modify current clipping path by intersecting it with current path.
 
         Use the nonzero winding number rule to determine which regions lie
@@ -111,7 +125,7 @@ class Stream(Object):
         """
         self.stream.append(b'W*' if even_odd else b'W')
 
-    def close(self):
+    def close(self) -> None:
         """Close current subpath.
 
         Append a straight line segment from the current point to the starting
@@ -120,7 +134,15 @@ class Stream(Object):
         """
         self.stream.append(b'h')
 
-    def curve_to(self, x1, y1, x2, y2, x3, y3):
+    def curve_to(
+        self,
+        x1: float,
+        y1: float,
+        x2: float,
+        y2: float,
+        x3: float,
+        y3: float,
+    ) -> None:
         """Add cubic Bézier curve to current path.
 
         The curve shall extend from ``(x3, y3)`` using ``(x1, y1)`` and ``(x2,
@@ -132,7 +154,7 @@ class Stream(Object):
             _to_bytes(x2), _to_bytes(y2),
             _to_bytes(x3), _to_bytes(y3), b'c')))
 
-    def curve_start_to(self, x2, y2, x3, y3):
+    def curve_start_to(self, x2: float, y2: float, x3: float, y3: float) -> None:
         """Add cubic Bézier curve to current path
 
         The curve shall extend to ``(x3, y3)`` using the current point and
@@ -143,7 +165,7 @@ class Stream(Object):
             _to_bytes(x2), _to_bytes(y2),
             _to_bytes(x3), _to_bytes(y3), b'v')))
 
-    def curve_end_to(self, x1, y1, x3, y3):
+    def curve_end_to(self, x1:float, y1: float, x3: float, y3: float)->None:
         """Add cubic Bézier curve to current path
 
         The curve shall extend to ``(x3, y3)`` using `(x1, y1)`` and ``(x3,
@@ -154,23 +176,23 @@ class Stream(Object):
             _to_bytes(x1), _to_bytes(y1),
             _to_bytes(x3), _to_bytes(y3), b'y')))
 
-    def draw_x_object(self, reference):
+    def draw_x_object(self, reference: str) -> None:
         """Draw object given by reference."""
         self.stream.append(b'/' + _to_bytes(reference) + b' Do')
 
-    def end(self):
+    def end(self) -> None:
         """End path without filling or stroking."""
         self.stream.append(b'n')
 
-    def end_marked_content(self):
+    def end_marked_content(self) -> None:
         """End marked-content sequence."""
         self.stream.append(b'EMC')
 
-    def end_text(self):
+    def end_text(self) -> None:
         """End text object."""
         self.stream.append(b'ET')
 
-    def fill(self, even_odd=False):
+    def fill(self, even_odd: bool = False) -> None:
         """Fill path using nonzero winding rule.
 
         Use even-odd rule if ``even_odd`` is set to ``True``.
@@ -178,7 +200,7 @@ class Stream(Object):
         """
         self.stream.append(b'f*' if even_odd else b'f')
 
-    def fill_and_stroke(self, even_odd=False):
+    def fill_and_stroke(self, even_odd: bool = False) -> None:
         """Fill and stroke path usign nonzero winding rule.
 
         Use even-odd rule if ``even_odd`` is set to ``True``.
@@ -186,7 +208,7 @@ class Stream(Object):
         """
         self.stream.append(b'B*' if even_odd else b'B')
 
-    def fill_stroke_and_close(self, even_odd=False):
+    def fill_stroke_and_close(self, even_odd: bool = False) -> None:
         """Fill, stroke and close path using nonzero winding rule.
 
         Use even-odd rule if ``even_odd`` is set to ``True``.
@@ -194,7 +216,14 @@ class Stream(Object):
         """
         self.stream.append(b'b*' if even_odd else b'b')
 
-    def inline_image(self, width, height, color_space, bpc, raw_data):
+    def inline_image(
+        self,
+        width: int,
+        height: int,
+        color_space: str,
+        bpc: int,
+        raw_data: bytes,
+    ) -> None:
         """Add an inline image.
 
         :param width: The width of the image.
@@ -225,31 +254,31 @@ class Stream(Object):
             b'EI',
         )))
 
-    def line_to(self, x, y):
+    def line_to(self, x: float, y: float) -> None:
         """Add line from current point to point ``(x, y)``."""
         self.stream.append(b' '.join((_to_bytes(x), _to_bytes(y), b'l')))
 
-    def move_to(self, x, y):
+    def move_to(self, x: float, y: float) -> None:
         """Begin new subpath by moving current point to ``(x, y)``."""
         self.stream.append(b' '.join((_to_bytes(x), _to_bytes(y), b'm')))
 
-    def move_text_to(self, x, y):
+    def move_text_to(self, x: float, y: float) -> None:
         """Move text to next line at ``(x, y)`` distance from previous line."""
         self.stream.append(b' '.join((_to_bytes(x), _to_bytes(y), b'Td')))
 
-    def paint_shading(self, name):
+    def paint_shading(self, name: str) -> None:
         """Paint shape and color shading using shading dictionary ``name``."""
         self.stream.append(b'/' + _to_bytes(name) + b' sh')
 
-    def pop_state(self):
+    def pop_state(self) -> None:
         """Restore graphic state."""
         self.stream.append(b'Q')
 
-    def push_state(self):
+    def push_state(self) -> None:
         """Save graphic state."""
         self.stream.append(b'q')
 
-    def rectangle(self, x, y, width, height):
+    def rectangle(self, x: float, y: float, width: float, height: float) -> None:
         """Add rectangle to current path as complete subpath.
 
         ``(x, y)`` is the lower-left corner and width and height the
@@ -260,7 +289,7 @@ class Stream(Object):
             _to_bytes(x), _to_bytes(y),
             _to_bytes(width), _to_bytes(height), b're')))
 
-    def set_color_rgb(self, r, g, b, stroke=False):
+    def set_color_rgb(self, r: float, g: float, b: float, stroke: bool = False) -> None:
         """Set RGB color for nonstroking operations.
 
         Set RGB color for stroking operations instead if ``stroke`` is set to
@@ -271,7 +300,7 @@ class Stream(Object):
             _to_bytes(r), _to_bytes(g), _to_bytes(b),
             (b'RG' if stroke else b'rg'))))
 
-    def set_color_space(self, space, stroke=False):
+    def set_color_space(self, space: str, stroke: bool = False) -> None:
         """Set the nonstroking color space.
 
         If stroke is set to ``True``, set the stroking color space instead.
@@ -280,7 +309,12 @@ class Stream(Object):
         self.stream.append(
             b'/' + _to_bytes(space) + b' ' + (b'CS' if stroke else b'cs'))
 
-    def set_color_special(self, name, stroke=False, *operands):
+    def set_color_special(
+        self,
+        name: str,
+        stroke: bool = False,
+        *operands: _SERIALIZABLE,
+    ) -> None:
         """Set special color for nonstroking operations.
 
         Set special color for stroking operation if ``stroke`` is set to ``True``.
@@ -292,7 +326,11 @@ class Stream(Object):
             b' '.join(_to_bytes(operand) for operand in operands) + b' ' +
             (b'SCN' if stroke else b'scn'))
 
-    def set_dash(self, dash_array, dash_phase):
+    def set_dash(
+        self,
+        dash_array: Iterable[_SERIALIZABLE],
+        dash_phase: int,
+    ) -> None:
         """Set dash line pattern.
 
         :param dash_array: Dash pattern.
@@ -304,32 +342,40 @@ class Stream(Object):
         self.stream.append(b' '.join((
             Array(dash_array).data, _to_bytes(dash_phase), b'd')))
 
-    def set_font_size(self, font, size):
+    def set_font_size(self, font: str, size: float) -> None:
         """Set font name and size."""
         self.stream.append(
             b'/' + _to_bytes(font) + b' ' + _to_bytes(size) + b' Tf')
 
-    def set_text_rendering(self, mode):
+    def set_text_rendering(self, mode: int) -> None:
         """Set text rendering mode."""
         self.stream.append(_to_bytes(mode) + b' Tr')
 
-    def set_text_rise(self, height):
+    def set_text_rise(self, height: float) -> None:
         """Set text rise."""
         self.stream.append(_to_bytes(height) + b' Ts')
 
-    def set_line_cap(self, line_cap):
+    def set_line_cap(self, line_cap: int) -> None:
         """Set line cap style."""
         self.stream.append(_to_bytes(line_cap) + b' J')
 
-    def set_line_join(self, line_join):
+    def set_line_join(self, line_join: int) -> None:
         """Set line join style."""
         self.stream.append(_to_bytes(line_join) + b' j')
 
-    def set_line_width(self, width):
+    def set_line_width(self, width: float) -> None:
         """Set line width."""
         self.stream.append(_to_bytes(width) + b' w')
 
-    def set_matrix(self, a, b, c, d, e, f):
+    def set_matrix(
+        self,
+        a: float,
+        b: float,
+        c: float,
+        d: float,
+        e: float,
+        f: float,
+    ) -> None:
         """Set current transformation matrix.
 
         :param a: Top left number in the matrix.
@@ -350,11 +396,11 @@ class Stream(Object):
             _to_bytes(a), _to_bytes(b), _to_bytes(c),
             _to_bytes(d), _to_bytes(e), _to_bytes(f), b'cm')))
 
-    def set_miter_limit(self, miter_limit):
+    def set_miter_limit(self, miter_limit: float) -> None:
         """Set miter limit."""
         self.stream.append(_to_bytes(miter_limit) + b' M')
 
-    def set_state(self, state_name):
+    def set_state(self, state_name: str) -> None:
         """Set specified parameters in graphic state.
 
         :param state_name: Name of the graphic state.
@@ -362,7 +408,15 @@ class Stream(Object):
         """
         self.stream.append(b'/' + _to_bytes(state_name) + b' gs')
 
-    def set_text_matrix(self, a, b, c, d, e, f):
+    def set_text_matrix(
+        self,
+        a: float,
+        b: float,
+        c: float,
+        d: float,
+        e: float,
+        f: float,
+    ) -> None:
         """Set current text and text line transformation matrix.
 
         :param a: Top left number in the matrix.
@@ -383,24 +437,24 @@ class Stream(Object):
             _to_bytes(a), _to_bytes(b), _to_bytes(c),
             _to_bytes(d), _to_bytes(e), _to_bytes(f), b'Tm')))
 
-    def show_text(self, text):
+    def show_text(self, text: "String") -> None:
         """Show text strings with individual glyph positioning."""
         self.stream.append(b'[' + _to_bytes(text) + b'] TJ')
 
-    def show_text_string(self, text):
+    def show_text_string(self, text: str) -> None:
         """Show single text string."""
         self.stream.append(String(text).data + b' Tj')
 
-    def stroke(self):
+    def stroke(self) -> None:
         """Stroke path."""
         self.stream.append(b'S')
 
-    def stroke_and_close(self):
+    def stroke_and_close(self) -> None:
         """Stroke and close path."""
         self.stream.append(b's')
 
     @property
-    def data(self):
+    def data(self) -> bytes:
         stream = b'\n'.join(_to_bytes(item) for item in self.stream)
         extra = Dictionary(self.extra.copy())
         if self.compress:
@@ -414,13 +468,13 @@ class Stream(Object):
 
 class String(Object):
     """PDF String object."""
-    def __init__(self, string=''):
+    def __init__(self, string: str | bytes = "") -> None:
         super().__init__()
         #: Unicode string.
         self.string = string
 
     @property
-    def data(self):
+    def data(self) -> bytes:
         try:
             # "A literal string is written as an arbitrary number of characters
             # enclosed in parentheses. Any characters may appear in a string
@@ -433,24 +487,24 @@ class String(Object):
             return b'<' + encoded.hex().encode() + b'>'
 
 
-class Array(Object, list):
+class Array(Object, list[_SERIALIZABLE]):
     """PDF Array object."""
-    def __init__(self, array=None):
+    def __init__(self, array: Iterable[_SERIALIZABLE] | None = None) -> None:
         Object.__init__(self)
         list.__init__(self, array or [])
 
     @property
-    def data(self):
+    def data(self) -> bytes:
         return b'[' + b' '.join(_to_bytes(child) for child in self) + b']'
 
 
 class PDF:
     """PDF document."""
-    def __init__(self):
+    def __init__(self) -> None:
         """Create a PDF document."""
 
         #: Python :obj:`list` containing the PDF’s objects.
-        self.objects = []
+        self.objects: list[Object] = []
 
         zero_object = Object()
         zero_object.generation = 65535
@@ -478,31 +532,31 @@ class PDF:
         #: Current position in the PDF.
         self.current_position = 0
         #: Position of the cross reference table.
-        self.xref_position = None
+        self.xref_position: int | None = None
 
-    def add_page(self, page):
+    def add_page(self, page: Dictionary) -> None:
         """Add page to the PDF.
 
         :param page: New page.
         :type page: :class:`Dictionary`
 
         """
-        self.pages['Count'] += 1
+        self.pages['Count'] += 1  # type: ignore
         self.add_object(page)
-        self.pages['Kids'].extend([page.number, 0, 'R'])
+        self.pages['Kids'].extend([page.number, 0, 'R'])  # type: ignore
 
-    def add_object(self, object_):
+    def add_object(self, object_: Object) -> None:
         """Add object to the PDF."""
         object_.number = len(self.objects)
         self.objects.append(object_)
 
     @property
-    def page_references(self):
+    def page_references(self) -> tuple[bytes, ...]:
         return tuple(
             f'{object_number} 0 R'.encode('ascii')
-            for object_number in self.pages['Kids'][::3])
+            for object_number in self.pages['Kids'][::3])  # type: ignore
 
-    def write_line(self, content, output):
+    def write_line(self, content: bytes, output: io.BufferedIOBase) -> None:
         """Write line to output.
 
         :param content: Content to write.
@@ -514,7 +568,12 @@ class PDF:
         self.current_position += len(content) + 1
         output.write(content + b'\n')
 
-    def write(self, output, version=b'1.7', identifier=False, compress=False):
+    def write(self,
+        output: io.BufferedIOBase,
+        version: bytes = b'1.7',
+        identifier: bool | bytes | None = False,
+        compress: bool = False,
+    ) -> None:
         """Write PDF to output.
 
         :param output: Output stream.
@@ -530,7 +589,7 @@ class PDF:
         # Convert version and identifier to bytes
         version = _to_bytes(version or b'1.7')  # Force 1.7 when None
         if identifier not in (False, True, None):
-            identifier = _to_bytes(identifier)
+            identifier = _to_bytes(identifier)  # type: ignore
 
         # Add info object if needed
         if self.info:
@@ -553,19 +612,21 @@ class PDF:
                     self.write_line(object_.indirect, output)
 
             # Write compressed objects in object stream
-            stream = [[]]
+            object_index_list: list[int] = []
+            stream: list[_SERIALIZABLE] = []
             position = 0
             for i, object_ in enumerate(compressed_objects):
                 data = object_.data
                 stream.append(data)
-                stream[0].append(object_.number)
-                stream[0].append(position)
+                object_index_list.append(object_.number)
+                object_index_list.append(position)
                 position += len(data) + 1
-            stream[0] = ' '.join(str(i) for i in stream[0])
-            extra = {
+            object_index_bytes = ' '.join(str(i) for i in object_index_list).encode()
+            stream.insert(0, object_index_bytes)
+            extra: dict[str, _SERIALIZABLE] = {
                 'Type': '/ObjStm',
                 'N': len(compressed_objects),
-                'First': len(stream[0]) + 1,
+                'First': len(object_index_bytes) + 1,
             }
             object_stream = Stream(stream, extra, compress)
             object_stream.offset = self.current_position
@@ -573,7 +634,7 @@ class PDF:
             self.write_line(object_stream.indirect, output)
 
             # Write cross-reference stream
-            xref = []
+            xref: list[tuple[int, int, int]] = []
             dict_index = 0
             for object_ in self.objects:
                 if object_.compressible:
