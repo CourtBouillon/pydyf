@@ -423,7 +423,7 @@ class String(Object):
     """PDF String object."""
     def __init__(self, string=''):
         super().__init__()
-        #: Unicode string.
+        #: Unicode string or encoded bytestring.
         self.string = string
 
     @property
