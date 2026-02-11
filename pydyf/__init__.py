@@ -87,11 +87,11 @@ class Stream(Object):
     """PDF Stream object."""
     def __init__(self, stream=None, extra=None, compress=False):
         super().__init__()
-        #: Python array of data composing stream.
+        #: Python array of serializable data composing stream.
         self.stream = stream or []
         #: Metadata containing at least the length of the Stream.
         self.extra = extra or {}
-        #: Compress the stream data if set to ``True``. Default is ``False``.
+        #: Compress the stream data if set to :obj:`True`. Default is :obj:`False`.
         self.compress = compress
 
     def begin_marked_content(self, tag, property_list=None):
@@ -204,15 +204,11 @@ class Stream(Object):
     def inline_image(self, width, height, color_space, bpc, raw_data):
         """Add an inline image.
 
-        :param width: The width of the image.
-        :type width: :obj:`int`
-        :param height: The height of the image.
-        :type height: :obj:`int`
-        :param colorspace: The color space of the image, f.e. RGB, Gray.
-        :type colorspace: :obj:`str`
-        :param bpc: The bits per component. 1 for BW, 8 for grayscale.
-        :type bpc: :obj:`int`
-        :param raw_data: The raw pixel data.
+        :param int width: The width of the image.
+        :param int height: The height of the image.
+        :param str colorspace: The color space of the image, f.e. RGB, Gray.
+        :param int bpc: The bits per component. 1 for BW, 8 for grayscale.
+        :param bytes raw_data: The raw pixel data.
 
         """
         data = zlib.compress(raw_data) if self.compress else raw_data
@@ -304,8 +300,7 @@ class Stream(Object):
 
         :param dash_array: Dash pattern.
         :type dash_array: :term:`iterable`
-        :param dash_phase: Start of dash phase.
-        :type dash_phase: :obj:`int`
+        :param int dash_phase: Start of dash phase.
 
         """
         self.stream.append(b' '.join((
@@ -339,18 +334,12 @@ class Stream(Object):
     def set_matrix(self, a, b, c, d, e, f):
         """Set current transformation matrix.
 
-        :param a: Top left number in the matrix.
-        :type a: :obj:`int` or :obj:`float`
-        :param b: Top middle number in the matrix.
-        :type b: :obj:`int` or :obj:`float`
-        :param c: Middle left number in the matrix.
-        :type c: :obj:`int` or :obj:`float`
-        :param d: Middle middle number in the matrix.
-        :type d: :obj:`int` or :obj:`float`
-        :param e: Bottom left number in the matrix.
-        :type e: :obj:`int` or :obj:`float`
-        :param f: Bottom middle number in the matrix.
-        :type f: :obj:`int` or :obj:`float`
+        :param float a: Top left number in the matrix.
+        :param float b: Top middle number in the matrix.
+        :param float c: Middle left number in the matrix.
+        :param float d: Middle middle number in the matrix.
+        :param float e: Bottom left number in the matrix.
+        :param float f: Bottom middle number in the matrix.
 
         """
         self.stream.append(b' '.join((
@@ -372,18 +361,12 @@ class Stream(Object):
     def set_text_matrix(self, a, b, c, d, e, f):
         """Set current text and text line transformation matrix.
 
-        :param a: Top left number in the matrix.
-        :type a: :obj:`int` or :obj:`float`
-        :param b: Top middle number in the matrix.
-        :type b: :obj:`int` or :obj:`float`
-        :param c: Middle left number in the matrix.
-        :type c: :obj:`int` or :obj:`float`
-        :param d: Middle middle number in the matrix.
-        :type d: :obj:`int` or :obj:`float`
-        :param e: Bottom left number in the matrix.
-        :type e: :obj:`int` or :obj:`float`
-        :param f: Bottom middle number in the matrix.
-        :type f: :obj:`int` or :obj:`float`
+        :param float a: Top left number in the matrix.
+        :param float b: Top middle number in the matrix.
+        :param float c: Middle left number in the matrix.
+        :param float d: Middle middle number in the matrix.
+        :param float e: Bottom left number in the matrix.
+        :param float f: Bottom middle number in the matrix.
 
         """
         self.stream.append(b' '.join((
@@ -512,8 +495,7 @@ class PDF:
     def write_line(self, content, output):
         """Write line to output.
 
-        :param content: Content to write.
-        :type content: :obj:`bytes`
+        :param bytes content: Content to write.
         :param output: Output stream.
         :type output: binary :term:`file object`
 
