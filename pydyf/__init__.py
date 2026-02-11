@@ -542,19 +542,21 @@ class PDF:
                     self.write_line(object_.indirect, output)
 
             # Write compressed objects in object stream.
-            stream = [[]]
+            stream = []
+            object_index_list = []
             position = 0
             for i, object_ in enumerate(compressed_objects):
                 data = object_.data
                 stream.append(data)
-                stream[0].append(object_.number)
-                stream[0].append(position)
+                object_index_list.append(object_.number)
+                object_index_list.append(position)
                 position += len(data) + 1
-            stream[0] = ' '.join(str(i) for i in stream[0])
+            object_index_string = ' '.join(str(i) for i in object_index_list)
+            stream.insert(0, object_index_string)
             extra = {
                 'Type': '/ObjStm',
                 'N': len(compressed_objects),
-                'First': len(stream[0]) + 1,
+                'First': len(object_index_string) + 1,
             }
             object_stream = Stream(stream, extra, compress)
             object_stream.offset = self.current_position
