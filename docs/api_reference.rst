@@ -3,6 +3,8 @@ API Reference
 
 .. module:: pydyf
 
+.. autofunction:: name
+
 .. autoclass:: Object
    :members:
 

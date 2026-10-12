@@ -758,3 +758,18 @@ def test_version():
 ])
 def test_string_encoding(string, data):
     assert pydyf.String(string).data == data
+
+
+@pytest.mark.parametrize(('string', 'name'), [
+    ('abc', b'/abc'),
+    ('A;Name_With-Various***Characters?', b'/A;Name_With-Various***Characters?'),
+    ('1.2', b'/1.2'),
+    ('$$', b'/$$'),
+    ('@pattern', b'/@pattern'),
+    ('.notdef', b'/.notdef'),
+    ('Lime Green', b'/Lime#20Green'),
+    ('paired()parentheses', b'/paired#28#29parentheses'),
+    ('The_Key_of_F#_Minor', b'/The_Key_of_F#23_Minor'),
+])
+def test_name_object(string, name):
+    assert pydyf.name(string) == name
