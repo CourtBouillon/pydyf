@@ -748,10 +748,13 @@ def test_version():
     assert b'2.0' in pdf.getvalue()
 
 
-def test_string_encoding():
-    assert pydyf.String('abc').data == b'(abc)'
-    assert pydyf.String('déf').data == b'<feff006400e90066>'
-    assert pydyf.String('♡').data == b'<feff2661>'
-    assert pydyf.String('\\abc').data == b'(\\\\abc)'
-    assert pydyf.String('abc(').data == b'(abc\\()'
-    assert pydyf.String('ab)c').data == b'(ab\\)c)'
+@pytest.mark.parametrize(('string', 'data'), [
+    ('abc', b'(abc)'),
+    ('déf', b'<feff006400e90066>'),
+    ('♡', b'<feff2661>'),
+    ('\\abc', b'(\\\\abc)'),
+    ('abc(', b'(abc\\()'),
+    ('ab)c', b'(ab\\)c)'),
+])
+def test_string_encoding(string, data):
+    assert pydyf.String(string).data == data
