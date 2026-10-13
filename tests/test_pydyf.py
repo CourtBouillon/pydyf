@@ -2,6 +2,7 @@ import io
 import re
 
 import pytest
+from PIL import Image
 
 import pydyf
 
@@ -99,6 +100,104 @@ def test_line_to():
     ''')
 
 
+def test_line_cap():
+    document = pydyf.PDF()
+
+    draw = pydyf.Stream()
+    draw.move_to(2, 2)
+    draw.set_line_width(2)
+    draw.set_line_cap(2)
+    draw.line_to(2, 5)
+    draw.stroke()
+    document.add_object(draw)
+
+    document.add_page(pydyf.Dictionary({
+        'Type': '/Page',
+        'Parent': document.pages.reference,
+        'Contents': draw.reference,
+        'MediaBox': pydyf.Array([0, 0, 10, 10]),
+    }))
+
+    assert_pixels(document, '''
+        __________
+        __________
+        __________
+        __________
+        _KK_______
+        _KK_______
+        _KK_______
+        _KK_______
+        _KK_______
+        __________
+    ''')
+
+
+def test_line_join():
+    document = pydyf.PDF()
+
+    draw = pydyf.Stream()
+    draw.move_to(3, 1)
+    draw.set_line_width(4)
+    draw.set_line_join(2)
+    draw.line_to(3, 5)
+    draw.line_to(7, 5)
+    draw.stroke()
+    document.add_object(draw)
+
+    document.add_page(pydyf.Dictionary({
+        'Type': '/Page',
+        'Parent': document.pages.reference,
+        'Contents': draw.reference,
+        'MediaBox': pydyf.Array([0, 0, 10, 10]),
+    }))
+
+    assert_pixels(document, '''
+        __________
+        __________
+        __________
+        __zzKKK___
+        _zzKKKK___
+        _zKKKKK___
+        _KKKKKK___
+        _KKKK_____
+        _KKKK_____
+        __________
+    ''')
+
+
+def test_line_miter_limit():
+    document = pydyf.PDF()
+
+    draw = pydyf.Stream()
+    draw.move_to(3, 1)
+    draw.set_line_width(4)
+    draw.set_miter_limit(2)
+    draw.line_to(3, 5)
+    draw.line_to(3.1, 1)
+    draw.stroke()
+    document.add_object(draw)
+
+    document.add_page(pydyf.Dictionary({
+        'Type': '/Page',
+        'Parent': document.pages.reference,
+        'Contents': draw.reference,
+        'MediaBox': pydyf.Array([0, 0, 10, 10]),
+    }))
+
+    assert_pixels(document, '''
+        __________
+        __________
+        __________
+        __________
+        _zzzzz____
+        _KKKKz____
+        _KKKKz____
+        _KKKKz____
+        _KKKKz____
+        _zzzzz____
+    ''')
+
+
 def test_set_color_rgb_stroke():
     document = pydyf.PDF()
 
@@ -155,6 +254,69 @@ def test_set_color_rgb_fill():
         __RRRRR___
         __RRRRR___
         __RRRRR___
+        __________
+        __________
+    ''')
+
+
+def test_set_color_special_stroke():
+    document = pydyf.PDF()
+
+    draw = pydyf.Stream()
+    draw.rectangle(2, 2, 5, 6)
+    draw.set_line_width(2)
+    draw.set_color_space('DeviceGray')
+    draw.set_color_special(0, stroke=True)
+    draw.stroke()
+    document.add_object(draw)
+
+    document.add_page(pydyf.Dictionary({
+        'Type': '/Page',
+        'Parent': document.pages.reference,
+        'Contents': draw.reference,
+        'MediaBox': pydyf.Array([0, 0, 10, 10]),
+    }))
+
+    assert_pixels(document, '''
+        __________
+        _KKKKKKK__
+        _KKKKKKK__
+        _KK___KK__
+        _KK___KK__
+        _KK___KK__
+        _KK___KK__
+        _KKKKKKK__
+        _KKKKKKK__
+        __________
+    ''')
+
+
+def test_set_color_special_fill():
+    document = pydyf.PDF()
+
+    draw = pydyf.Stream()
+    draw.rectangle(2, 2, 5, 6)
+    draw.set_color_space('DeviceGray')
+    draw.set_color_special(0)
+    draw.fill()
+    document.add_object(draw)
+
+    document.add_page(pydyf.Dictionary({
+        'Type': '/Page',
+        'Parent': document.pages.reference,
+        'Contents': draw.reference,
+        'MediaBox': pydyf.Array([0, 0, 10, 10]),
+    }))
+
+    assert_pixels(document, '''
+        __________
+        __________
+        __KKKKK___
+        __KKKKK___
+        __KKKKK___
+        __KKKKK___
+        __KKKKK___
+        __KKKKK___
         __________
         __________
     ''')
@@ -596,6 +758,173 @@ def test_push_pop_state():
     ''')
 
 
+def test_inline_image():
+    document = pydyf.PDF()
+
+    x, y, width, height = 1, 1, 2, 2
+    image = Image.new('1', (width, height))
+    image.putdata((0, 1, 1, 0))
+    raw_data = image.tobytes()
+
+    draw = pydyf.Stream()
+    draw.push_state()
+    draw.set_matrix(width, 0, 0, height, x, y)
+    draw.inline_image(width, height, 'Gray', 1, raw_data)
+    draw.pop_state()
+    document.add_object(draw)
+
+    document.add_page(pydyf.Dictionary({
+        'Type': '/Page',
+        'Parent': document.pages.reference,
+        'Contents': draw.reference,
+        'MediaBox': pydyf.Array([0, 0, 4, 4]),
+        'Resources': pydyf.Dictionary({
+            'ProcSet': pydyf.Array(['/PDF', '/ImageB', '/ImageC', '/ImageI']),
+        }),
+    }))
+
+    assert_pixels(document, '''
+        ____
+        _K__
+        __K_
+        ____
+    ''')
+
+
+def test_pattern():
+    document = pydyf.PDF()
+
+    draw = pydyf.Stream()
+    draw.push_state()
+    draw.set_color_space('Pattern')
+    draw.set_color_special('p0')
+    draw.rectangle(0, 0, 10, 10)
+    draw.fill()
+    draw.pop_state()
+    document.add_object(draw)
+
+    x_object = pydyf.Stream(extra=pydyf.Dictionary({
+        'Type': '/XObject',
+        'Subtype': '/Form',
+        'BBox': pydyf.Array((0, 0, 10, 10)),
+        'Resources': pydyf.Dictionary({
+            'Shading': pydyf.Dictionary({
+                's0': pydyf.Dictionary({
+                    'ShadingType': 2,
+                    'ColorSpace': '/DeviceRGB',
+                    'Domain': pydyf.Array((0, 1)),
+                    'Coords': pydyf.Array((0, 5, 10, 5)),
+                    'Function': pydyf.Dictionary({
+                        'FunctionType': 3,
+                        'Domain': pydyf.Array((0, 1)),
+                        'Encode': pydyf.Array((0, 1, 0, 1, 0, 1)),
+                        'Bounds': pydyf.Array((0.5, 0.5)),
+                        'Functions': pydyf.Array((
+                            pydyf.Dictionary({
+                                'FunctionType': 2,
+                                'Domain': pydyf.Array((0, 1)),
+                                'C0': pydyf.Array((1, 1, 1)),
+                                'C1': pydyf.Array((1, 1, 1)),
+                                'N': 1,
+                            }),
+                            pydyf.Dictionary({
+                                'FunctionType': 2,
+                                'Domain': pydyf.Array((0, 1)),
+                                'C0': pydyf.Array((1, 1, 1)),
+                                'C1': pydyf.Array((1, 0, 0)),
+                                'N': 1,
+                            }),
+                            pydyf.Dictionary({
+                                'FunctionType': 2,
+                                'Domain': pydyf.Array((0, 1)),
+                                'C0': pydyf.Array((1, 0, 0)),
+                                'C1': pydyf.Array((1, 0, 0)),
+                                'N': 1,
+                            }),
+                        )),
+                    }),
+                }),
+            }),
+        }),
+    }))
+    x_object.paint_shading('s0')
+    document.add_object(x_object)
+
+    pattern = pydyf.Stream(extra=pydyf.Dictionary({
+        'Type': '/Pattern',
+        'PatternType': 1,
+        'BBox': pydyf.Array((0, 0, 10, 10)),
+        'XStep': 10,
+        'YStep': 10,
+        'TilingType': 1,
+        'PaintType': 1,
+        'Resources': pydyf.Dictionary({
+            'XObject': pydyf.Dictionary({'x0': x_object.reference}),
+        }),
+    }))
+    pattern.draw_x_object('x0')
+    document.add_object(pattern)
+
+    document.add_page(pydyf.Dictionary({
+        'Type': '/Page',
+        'Parent': document.pages.reference,
+        'Contents': draw.reference,
+        'MediaBox': pydyf.Array([0, 0, 10, 10]),
+        'Resources': pydyf.Dictionary({
+            'Pattern': pydyf.Dictionary({'p0': pattern.reference}),
+        }),
+    }))
+
+    assert_pixels(document, '''
+        ____zzRRRR
+        ____zzRRRR
+        ____zzRRRR
+        ____zzRRRR
+        ____zzRRRR
+        ____zzRRRR
+        ____zzRRRR
+        ____zzRRRR
+        ____zzRRRR
+        ____zzRRRR
+    ''')
+
+
+def test_begin_end_marked_content():
+    document = pydyf.PDF()
+
+    draw = pydyf.Stream()
+    draw.begin_marked_content('Artifact')
+    draw.rectangle(2, 2, 5, 6)
+    draw.fill()
+    draw.end_marked_content()
+    document.add_object(draw)
+
+    pdf = io.BytesIO()
+    document.write(pdf, version=b'2.0')
+    pdf_bytes = pdf.getvalue()
+    assert b'BMC' in pdf_bytes
+    assert b'EMC' in pdf_bytes
+
+
+def test_begin_end_marked_content_properties():
+    document = pydyf.PDF()
+
+    draw = pydyf.Stream()
+    property_list = pydyf.Dictionary({'MCID': 10})
+    draw.begin_marked_content('Artifact', property_list)
+    draw.rectangle(2, 2, 5, 6)
+    draw.fill()
+    draw.end_marked_content()
+    document.add_object(draw)
+
+    pdf = io.BytesIO()
+    document.write(pdf, version=b'2.0')
+    pdf_bytes = pdf.getvalue()
+    assert b'BDC' in pdf_bytes
+    assert b'/MCID' in pdf_bytes
+    assert b'EMC' in pdf_bytes
+
+
 def test_types():
     document = pydyf.PDF()
 
@@ -708,6 +1037,192 @@ def test_text():
     ''')
 
 
+def test_text_string():
+    document = pydyf.PDF()
+
+    font = pydyf.Dictionary({
+        'Type': '/Font',
+        'Subtype': '/Type1',
+        'Name': '/F1',
+        'BaseFont': '/Helvetica',
+        'Encoding': '/MacRomanEncoding',
+    })
+    document.add_object(font)
+
+    draw = pydyf.Stream()
+    draw.begin_text()
+    draw.set_font_size('F1', 200)
+    draw.set_text_matrix(1, 0, 0, 1, -20, 5)
+    draw.show_text_string('l')
+    draw.end_text()
+
+    document.add_object(draw)
+
+    document.add_page(pydyf.Dictionary({
+        'Type': '/Page',
+        'Parent': document.pages.reference,
+        'Contents': draw.reference,
+        'MediaBox': pydyf.Array([0, 0, 10, 10]),
+        'Resources': pydyf.Dictionary({
+            'ProcSet': pydyf.Array(['/PDF', '/Text']),
+            'Font': pydyf.Dictionary({'F1': font.reference}),
+        }),
+    }))
+
+    assert_pixels(document, '''
+        KKKKKKKKKK
+        KKKKKKKKKK
+        KKKKKKKKKK
+        KKKKKKKKKK
+        KKKKKKKKKK
+        zzzzzzzzzz
+        __________
+        __________
+        __________
+        __________
+    ''')
+
+
+def test_move_text_to():
+    document = pydyf.PDF()
+
+    font = pydyf.Dictionary({
+        'Type': '/Font',
+        'Subtype': '/Type1',
+        'Name': '/F1',
+        'BaseFont': '/Helvetica',
+        'Encoding': '/MacRomanEncoding',
+    })
+    document.add_object(font)
+
+    draw = pydyf.Stream()
+    draw.begin_text()
+    draw.set_font_size('F1', 200)
+    draw.move_text_to(-20, 5)
+    draw.show_text(pydyf.String('l'))
+    draw.end_text()
+
+    document.add_object(draw)
+
+    document.add_page(pydyf.Dictionary({
+        'Type': '/Page',
+        'Parent': document.pages.reference,
+        'Contents': draw.reference,
+        'MediaBox': pydyf.Array([0, 0, 10, 10]),
+        'Resources': pydyf.Dictionary({
+            'ProcSet': pydyf.Array(['/PDF', '/Text']),
+            'Font': pydyf.Dictionary({'F1': font.reference}),
+        }),
+    }))
+
+    assert_pixels(document, '''
+        KKKKKKKKKK
+        KKKKKKKKKK
+        KKKKKKKKKK
+        KKKKKKKKKK
+        KKKKKKKKKK
+        zzzzzzzzzz
+        __________
+        __________
+        __________
+        __________
+    ''')
+
+
+def test_text_rise():
+    document = pydyf.PDF()
+
+    font = pydyf.Dictionary({
+        'Type': '/Font',
+        'Subtype': '/Type1',
+        'Name': '/F1',
+        'BaseFont': '/Helvetica',
+        'Encoding': '/MacRomanEncoding',
+    })
+    document.add_object(font)
+
+    draw = pydyf.Stream()
+    draw.begin_text()
+    draw.set_font_size('F1', 200)
+    draw.set_text_matrix(1, 0, 0, 1, -20, 5)
+    draw.set_text_rise(3)
+    draw.show_text(pydyf.String('l'))
+    draw.end_text()
+
+    document.add_object(draw)
+
+    document.add_page(pydyf.Dictionary({
+        'Type': '/Page',
+        'Parent': document.pages.reference,
+        'Contents': draw.reference,
+        'MediaBox': pydyf.Array([0, 0, 10, 10]),
+        'Resources': pydyf.Dictionary({
+            'ProcSet': pydyf.Array(['/PDF', '/Text']),
+            'Font': pydyf.Dictionary({'F1': font.reference}),
+        }),
+    }))
+
+    assert_pixels(document, '''
+        KKKKKKKKKK
+        KKKKKKKKKK
+        zzzzzzzzzz
+        __________
+        __________
+        __________
+        __________
+        __________
+        __________
+        __________
+    ''')
+
+
+def test_text_rendering():
+    document = pydyf.PDF()
+
+    font = pydyf.Dictionary({
+        'Type': '/Font',
+        'Subtype': '/Type1',
+        'Name': '/F1',
+        'BaseFont': '/Helvetica',
+        'Encoding': '/MacRomanEncoding',
+    })
+    document.add_object(font)
+
+    draw = pydyf.Stream()
+    draw.begin_text()
+    draw.set_font_size('F1', 200)
+    draw.set_text_matrix(1, 0, 0, 1, -20, 5)
+    draw.set_text_rendering(3)
+    draw.show_text(pydyf.String('l'))
+    draw.end_text()
+
+    document.add_object(draw)
+
+    document.add_page(pydyf.Dictionary({
+        'Type': '/Page',
+        'Parent': document.pages.reference,
+        'Contents': draw.reference,
+        'MediaBox': pydyf.Array([0, 0, 10, 10]),
+        'Resources': pydyf.Dictionary({
+            'ProcSet': pydyf.Array(['/PDF', '/Text']),
+            'Font': pydyf.Dictionary({'F1': font.reference}),
+        }),
+    }))
+
+    assert_pixels(document, '''
+        __________
+        __________
+        __________
+        __________
+        __________
+        __________
+        __________
+        __________
+        __________
+        __________
+    ''')
+
+
 @pytest.mark.parametrize('compress', [False, True])
 def test_no_identifier(compress):
     document = pydyf.PDF()
@@ -739,6 +1254,60 @@ def test_custom_identifier(compress):
         b'/ID \\[\\(abc\\) \\(([0-9a-f]{32})\\)\\]',
         pdf.getvalue()
     ) is not None
+
+
+@pytest.mark.parametrize('compress', [False, True])
+def test_info(compress):
+    document = pydyf.PDF()
+    document.info['Producer'] = 'pydyf'
+    pdf = io.BytesIO()
+    document.write(pdf, compress=compress)
+    pdf_bytes = pdf.getvalue()
+    assert b'Info' in pdf_bytes
+    if not compress:
+        assert b'Producer' in pdf_bytes
+        assert b'pydyf' in pdf_bytes
+
+
+@pytest.mark.parametrize('compress', [False, True])
+def test_no_info(compress):
+    document = pydyf.PDF()
+    pdf = io.BytesIO()
+    document.write(pdf, compress=compress)
+    assert b'Info' not in pdf.getvalue()
+
+
+def test_page_references():
+    document = pydyf.PDF()
+
+    draw = pydyf.Stream()
+    draw.rectangle(2, 2, 5, 6)
+    draw.set_line_width(2)
+    draw.stroke()
+    document.add_object(draw)
+
+    document.add_page(pydyf.Dictionary({
+        'Type': '/Page',
+        'Parent': document.pages.reference,
+        'Contents': draw.reference,
+        'MediaBox': pydyf.Array([0, 0, 10, 10]),
+    }))
+
+    assert len(document.page_references) == 1
+
+    draw = pydyf.Stream()
+    draw.rectangle(1, 1, 2, 3)
+    draw.fill()
+    document.add_object(draw)
+
+    document.add_page(pydyf.Dictionary({
+        'Type': '/Page',
+        'Parent': document.pages.reference,
+        'Contents': draw.reference,
+        'MediaBox': pydyf.Array([0, 0, 10, 10]),
+    }))
+
+    assert len(document.page_references) == 2
 
 
 def test_version():

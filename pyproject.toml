@@ -39,18 +39,22 @@ Donation = 'https://opencollective.com/courtbouillon'
 
 [project.optional-dependencies]
 doc = ['sphinx', 'furo']
-test = ['pytest', 'ruff', 'pillow >=12.1.0']
+test = ['pytest', 'pytest-cov', 'ruff', 'pillow >=12.1.0']
 
 [tool.flit.sdist]
 exclude = ['.*']
+
+[tool.pytest]
+addopts = ['--cov', '--cov-fail-under=100']
 
 [tool.coverage.run]
 branch = true
 include = ['tests/*', 'pydyf/*']
 
 [tool.coverage.report]
-exclude_lines = ['pragma: no cover', 'def __repr__', 'raise NotImplementedError']
+exclude_lines = ['pragma: no cover', 'raise NotImplementedError']
 omit = ['.*']
+fail_under = 100
 
 [tool.ruff.lint]
 select = ['E', 'W', 'F', 'I', 'N', 'RUF', 'T20', 'PIE', 'PT', 'RSE', 'UP', 'Q']
