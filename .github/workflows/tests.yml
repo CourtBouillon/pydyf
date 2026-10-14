@@ -15,8 +15,8 @@ jobs:
           - os: ubuntu-latest
             python-version: 'pypy3.11-7.3'
     steps:
-      - uses: actions/checkout
-      - uses: actions/setup-python
+      - uses: actions/checkout@7
+      - uses: actions/setup-python@7
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install Ghostscript (Ubuntu)
