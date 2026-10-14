@@ -2,6 +2,55 @@ Changelog
 =========
 
 
+Version 0.13.0
+--------------
+
+Released on 2026-10-14.
+
+Dependencies:
+
+* Python 3.15 is supported and tested
+* Python 3.11+ is now needed, Python 3.10 is not supported anymore
+
+New features:
+
+* Add a new "name" function to safely create name objects
+
+Bug fixes:
+
+* Test both compressed and uncompressed PDF generation
+
+Contributors:
+
+* Guillaume Ayoub
+* Jeremy Lainé
+
+Backers and sponsors:
+
+* Spacinov
+* Syslifters
+* Kobalt
+* Grip Angebotssoftware
+* Simonsoft
+* Menutech
+* KontextWork
+* Hammerbacher
+* TrainingSparkle
+* Healthchecks.io
+* Method B
+* Prothesis Dental Solutions
+* Yanal-Yves Fargialla
+* PDFBolt
+* FieldHub
+* Morntag
+* Xavid
+* Charlie S.
+* Prospex
+* Kai DeLorenzo
+* Unforgettable Nordic
+* Dylan Moonfire
+
+
 Version 0.12.1
 --------------
 

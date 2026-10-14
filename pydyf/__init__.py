@@ -10,7 +10,7 @@ from codecs import BOM_UTF16_BE
 from hashlib import md5
 from math import ceil, log
 
-VERSION = __version__ = '0.12.1'
+VERSION = __version__ = '0.13.0'
 
 
 def _to_bytes(item):
