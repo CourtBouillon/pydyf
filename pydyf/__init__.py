@@ -434,6 +434,8 @@ class String(Object):
             # except unbalanced parentheses and the backslash, which must be
             # treated specially."
             escaped = re.sub(rb'([\\\(\)])', rb'\\\1', _to_bytes(self.string))
+            # Raw CR and CRLF are normalized to LF by PDF readers.
+            escaped = escaped.replace(b'\r', br'\r').replace(b'\n', br'\n')
             return b'(' + escaped + b')'
         except UnicodeEncodeError:
             encoded = BOM_UTF16_BE + str(self.string).encode('utf-16-be')
