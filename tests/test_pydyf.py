@@ -1,6 +1,6 @@
 import io
 import re
-from subprocess import PIPE, run
+from subprocess import run
 
 import pytest
 from PIL import Image
@@ -1378,5 +1378,5 @@ def test_escaped_name_pdf(compress):
     result = run([
         'gs', '-q', '-dNOPAUSE', '-dBATCH', '-dSAFER',
         '-dPDFSTOPONERROR', '-dPDFSTOPONWARNING', '-sDEVICE=nullpage', '-'],
-        input=pdf.getvalue(), stdout=PIPE, stderr=PIPE)
+        input=pdf.getvalue(), capture_output=True)
     assert result.returncode == 0, result.stdout + result.stderr
