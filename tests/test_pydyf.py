@@ -1329,6 +1329,20 @@ def test_string_encoding(string, data):
     assert pydyf.String(string).data == data
 
 
+@pytest.mark.parametrize(('string', 'data'), [
+    ('one\rtwo', b'(one\\rtwo)'),
+    ('one\r\ntwo', b'(one\\r\\ntwo)'),
+    ('one\ntwo', b'(one\\ntwo)'),
+    ('\r\rone\r', b'(\\r\\rone\\r)'),
+    ('\\r', b'(\\\\r)'),
+    (b'one\rtwo', b'(one\\rtwo)'),
+    (b'one\r\ntwo', b'(one\\r\\ntwo)'),
+    (b'\x00\r\xff', b'(\x00\\r\xff)'),
+    ('é\rtwo', b'<feff00e9000d00740077006f>'),
+])
+def test_string_line_endings(string, data):
+    assert pydyf.String(string).data == data
+
 @pytest.mark.parametrize(('string', 'name'), [
     ('abc', b'/abc'),
     ('A;Name_With-Various***Characters?', b'/A;Name_With-Various***Characters?'),
