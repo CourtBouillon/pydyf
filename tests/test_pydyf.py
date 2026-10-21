@@ -1,5 +1,6 @@
 import io
 import re
+from subprocess import run
 
 import pytest
 from PIL import Image
@@ -1342,3 +1343,40 @@ def test_string_encoding(string, data):
 ])
 def test_name_object(string, name):
     assert pydyf.name(string) == name
+
+
+@pytest.mark.parametrize(('string', 'name'), [
+    ('rate%off', b'/rate#25off'),
+    ('%comment', b'/#25comment'),
+    ('100%', b'/100#25'),
+    ('%20', b'/#2520'),
+    ('{name}', b'/#7bname#7d'),
+    ('<>/[]()#%', b'/#3c#3e#2f#5b#5d#28#29#23#25'),
+    ('é\t\n', b'/#c3#a9#09#0a'),
+])
+def test_name_delimiters(string, name):
+    assert pydyf.name(string) == name
+
+
+@pytest.mark.parametrize('string', ['\0', 'part\0name'])
+def test_name_null_byte(string):
+    with pytest.raises(ValueError, match='null'):
+        pydyf.name(string)
+
+
+@pytest.mark.parametrize('compress', [False, True])
+def test_escaped_name_pdf(compress):
+    document = pydyf.PDF()
+    document.info['CustomName'] = pydyf.name('price%off{sale}')
+    document.add_page(pydyf.Dictionary({
+        'Type': '/Page',
+        'Parent': document.pages.reference,
+        'MediaBox': pydyf.Array([0, 0, 10, 10]),
+    }))
+    pdf = io.BytesIO()
+    document.write(pdf, compress=compress)
+    result = run([
+        'gs', '-q', '-dNOPAUSE', '-dBATCH', '-dSAFER',
+        '-dPDFSTOPONERROR', '-dPDFSTOPONWARNING', '-sDEVICE=nullpage', '-'],
+        input=pdf.getvalue(), capture_output=True)
+    assert result.returncode == 0, result.stdout + result.stderr

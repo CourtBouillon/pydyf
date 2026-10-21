@@ -28,9 +28,15 @@ def _to_bytes(item):
 
 
 def name(string):
-    """Create bytes with leading solidus representing a name object."""
+    """Create bytes with leading solidus representing a name object.
+
+    Null characters cannot be represented in PDF names.
+
+    """
+    if '\0' in string:
+        raise ValueError('PDF names cannot contain null characters')
     return b'/' + b''.join(
-        char.to_bytes() if 33 <= char <= 126 and char not in b'<>()[]/# '
+        char.to_bytes() if 33 <= char <= 126 and char not in b'<>()[]{}/#% '
         else f'#{char:02x}'.encode() for char in string.encode())
 
 
